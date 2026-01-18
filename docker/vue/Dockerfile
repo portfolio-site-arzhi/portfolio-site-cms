@@ -1,0 +1,22 @@
+FROM node:24.11.1-alpine AS builder
+
+ARG VITE_APP_NODE_ENV
+ARG VITE_APP_BACKEND_URL
+ARG VITE_APP_PORT
+
+ENV VITE_APP_NODE_ENV=$VITE_APP_NODE_ENV
+ENV VITE_APP_BACKEND_URL=$VITE_APP_BACKEND_URL
+ENV VITE_APP_PORT=$VITE_APP_PORT
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+CMD ["sleep", "infinity"]
+

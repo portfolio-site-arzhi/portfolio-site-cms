@@ -1,0 +1,18 @@
+services:
+  portfolio_site_cms:
+    build:
+      context: .
+      dockerfile: docker/vue/Dockerfile
+      args:
+        VITE_APP_NODE_ENV: ${VITE_APP_NODE_ENV}
+        VITE_APP_BACKEND_URL: ${VITE_APP_BACKEND_URL}
+        VITE_APP_PORT: ${VITE_APP_PORT}
+
+  portfolio_site_cms_nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    depends_on:
+      - portfolio_site_cms
+    ports:
+      - "3001:80"

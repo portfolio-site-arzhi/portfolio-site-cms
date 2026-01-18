@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  portfolio_site_cms:
+    container_name: portfolio_site_cms
+    restart: "no"
+
+  portfolio_site_cms_nginx:
+    container_name: portfolio_site_cms_nginx
+    restart: "no"
