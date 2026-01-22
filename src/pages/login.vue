@@ -58,6 +58,7 @@
 <route lang="yaml">
 meta:
   public: true
+  layout: blank
 </route>
 
 <script setup lang="ts">

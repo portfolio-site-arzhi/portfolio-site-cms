@@ -53,3 +53,10 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
 12) Konfirmasi Aksi Krusial (Wajib)
 - Aksi krusial (misalnya delete data atau logout) wajib pakai dialog konfirmasi.
 - Gunakan komponen dialog konfirmasi reusable (misalnya ConfirmDialog) agar konsisten.
+
+13) Referensi Halaman & Komponen
+- Untuk halaman atau fitur baru yang memakai table dan aksi CRUD, gunakan `src/pages/users.vue` sebagai referensi utama:
+  - v-data-table-server dengan pagination, sorting, dan pencarian server-side
+  - Pencarian pakai `@change="refreshPage"` dan `@click:clear="refreshPage"`
+  - Header table didefinisikan di file constant (contoh: `src/constants/user.constant.ts`)
+  - Aksi penting (ubah status, hapus, dll.) pakai ConfirmDialog reusable

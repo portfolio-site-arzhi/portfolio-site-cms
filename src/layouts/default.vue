@@ -32,8 +32,10 @@
         <v-list-item
           v-for="item in navItems"
           :key="item.title"
+          link
           :prepend-icon="item.icon"
           :title="item.title"
+          :to="item.to"
         />
       </v-list>
     </v-navigation-drawer>
