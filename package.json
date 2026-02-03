@@ -32,6 +32,7 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "@tsconfig/node22": "^22.0.0",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.9.0",

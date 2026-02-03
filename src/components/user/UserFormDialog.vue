@@ -9,21 +9,6 @@
       </v-card-title>
 
       <v-card-text>
-        <v-alert
-          v-if="formErrors.length > 0"
-          class="mb-3"
-          density="compact"
-          type="error"
-          variant="tonal"
-        >
-          <div
-            v-for="error in formErrors"
-            :key="error"
-          >
-            {{ error }}
-          </div>
-        </v-alert>
-
         <v-text-field
           v-model="email"
           :autocomplete="props.mode === 'create' ? 'off' : undefined"
@@ -87,12 +72,10 @@
 </template>
 
 <script lang="ts" setup>
-  import type { AxiosError } from 'axios'
-  import type { FormErrorResponse } from '@/model/http'
   import type { User } from '@/model/user'
   import { useForm } from 'vee-validate'
-  import * as yup from 'yup'
   import { createUserApi, updateUserApi } from '@/api/user-service'
+  import { createDefaultUserFormValues, userSchema } from '@/schemas/user'
 
   const props = defineProps<{
     modelValue: boolean
@@ -103,6 +86,7 @@
   const emit = defineEmits<{
     (e: 'update:modelValue', value: boolean): void
     (e: 'created' | 'updated', user: User): void
+    (e: 'failed', errors: string[]): void
   }>()
 
   const internalModel = computed({
@@ -114,14 +98,6 @@
     },
   })
 
-  const formErrors = ref<string[]>([])
-
-  const schema = yup.object({
-    email: yup.string().required('Email wajib diisi').email('Email tidak valid'),
-    name: yup.string().required('Nama wajib diisi'),
-    status: yup.boolean(),
-  })
-
   const {
     defineField,
     errors,
@@ -130,12 +106,8 @@
     resetForm,
     setValues,
   } = useForm({
-    validationSchema: schema,
-    initialValues: {
-      email: '',
-      name: '',
-      status: true,
-    },
+    validationSchema: userSchema,
+    initialValues: createDefaultUserFormValues(),
   })
 
   const [email, emailProps] = defineField('email')
@@ -163,25 +135,15 @@
   function initializeForm (): void {
     if (props.mode === 'create') {
       resetForm({
-        values: {
-          email: '',
-          name: '',
-          status: true,
-        },
+        values: createDefaultUserFormValues(),
       })
-      formErrors.value = []
       return
     }
 
     if (!props.user) {
       resetForm({
-        values: {
-          email: '',
-          name: '',
-          status: true,
-        },
+        values: createDefaultUserFormValues(),
       })
-      formErrors.value = []
       return
     }
 
@@ -190,7 +152,6 @@
       name: props.user.name,
       status: props.user.status,
     })
-    formErrors.value = []
   }
 
   function onCancel (): void {
@@ -198,8 +159,6 @@
   }
 
   const onSubmit = handleSubmit(values => {
-    formErrors.value = []
-
     if (props.mode === 'create') {
       return createUserApi({
         email: values.email,
@@ -212,7 +171,7 @@
         internalModel.value = false
       }).catch(error => {
         console.error('Failed to save user', error)
-        handleFormError(error)
+        emit('failed', extractFormErrors(error))
       })
     }
 
@@ -231,51 +190,30 @@
       internalModel.value = false
     }).catch(error => {
       console.error('Failed to save user', error)
-      handleFormError(error)
+      emit('failed', extractFormErrors(error))
     })
   })
 
-  function handleFormError (error: unknown): void {
-    const axiosError = extractAxiosError(error)
-
-    if (!axiosError) {
-      formErrors.value = ['Terjadi kesalahan tak terduga.']
-      return
-    }
-
-    const knownErrors = extractFormErrors(axiosError)
-
-    if (knownErrors.length > 0) {
-      formErrors.value = knownErrors
-      return
-    }
-
-    formErrors.value = ['Terjadi kesalahan saat menyimpan data pengguna.']
-  }
-
-  function extractAxiosError (error: unknown): AxiosError<FormErrorResponse> | null {
+  function extractFormErrors (error: unknown): string[] {
     if (typeof error !== 'object' || error === null) {
-      return null
+      return ['Terjadi kesalahan saat menyimpan data pengguna.']
     }
 
     if (!('isAxiosError' in error)) {
-      return null
+      return ['Terjadi kesalahan saat menyimpan data pengguna.']
     }
 
-    return error as AxiosError<FormErrorResponse> & { formErrors?: string[] }
-  }
+    const axiosError = error as { formErrors?: string[], response?: { data?: { errors?: string[] } } }
 
-  function extractFormErrors (error: AxiosError<FormErrorResponse> & { formErrors?: string[] }): string[] {
-    if (Array.isArray(error.formErrors)) {
-      return error.formErrors
+    if (Array.isArray(axiosError.formErrors) && axiosError.formErrors.length > 0) {
+      return axiosError.formErrors
     }
 
-    const data = error.response?.data
-
-    if (data && Array.isArray(data.errors)) {
+    const data = axiosError.response?.data
+    if (data && Array.isArray(data.errors) && data.errors.length > 0) {
       return data.errors
     }
 
-    return []
+    return ['Terjadi kesalahan saat menyimpan data pengguna.']
   }
 </script>

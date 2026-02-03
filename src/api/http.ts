@@ -5,6 +5,7 @@ import axios, {
   type AxiosResponse,
 } from 'axios'
 import router from '@/router'
+import { useAppStore } from '@/stores/app'
 import { clearIsLoggedInCookie } from '@/utils/auth-cookie'
 
 const backendUrl = import.meta.env.VITE_APP_BACKEND_URL
@@ -53,7 +54,11 @@ httpClient.interceptors.response.use(
       const data = response.data as FormErrorResponse | undefined
 
       if (data && Array.isArray(data.errors)) {
-        (error as AxiosError<FormErrorResponse> & { formErrors?: string[] }).formErrors = data.errors
+        const enhancedError = error as AxiosError<FormErrorResponse> & { formErrors?: string[] }
+        enhancedError.formErrors = data.errors
+
+        const appStore = useAppStore()
+        appStore.showError(data.errors.join(', '))
       }
 
       return Promise.reject(error)

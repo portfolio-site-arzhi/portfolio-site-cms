@@ -1,6 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import UserFormDialog from '../src/components/UserFormDialog.vue'
+import UserFormDialog from '../src/components/user/UserFormDialog.vue'
 import UsersPage from '../src/pages/users.vue'
 
 vi.mock('vuetify', () => ({

@@ -8,13 +8,19 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
 2) Menjalankan Project (Jangan jalankan dev server)
 - Jangan running aplikasi/dev server (saya sudah run). Fokus hanya ke unit test.
 - Jika ada perubahan code, buat/ubah unit test untuk mengetes flow utama.
-- Untuk menjalankan semua unit test: npm run test:run
 - Setiap selesai mengubah kode, jalankan: npm run type-check dan npm run lint
+- Untuk menjalankan semua unit test: npm run test:run
 
 3) Struktur File (Wajib, untuk semua file: component/ts/utils/test)
-- Pattern: lebih baik banyak file yang penting, spesifik, dan gampang untuk di-maintain dan di-debug.
-- Hindari 1 file besar untuk banyak komponen/flow/fitur yang tidak related.
-- Jika refactor/penambahan fitur membuat file membesar dan tidak fokus, pecah menjadi beberapa file yang jelas tanggung jawabnya.
+- Lebih baik punya banyak file yang penting dan spesifik, dengan nama file yang jelas
+  merepresentasikan fitur/tanggung jawabnya (misal: site-config.store.ts, home-tab.vue).
+- Hindari 1 file besar yang berisi banyak komponen/flow/fitur yang tidak related.
+- Jika refactor/penambahan fitur membuat sebuah file mulai membesar dan tidak fokus,
+  pindahkan bagian yang punya tanggung jawab jelas ke file baru yang namanya spesifik.
+  - Contoh pembagian tanggung jawab:
+    - src/model -> hanya interface/type untuk domain & payload API.
+    - src/schemas -> schema validasi (yup) + konfigurasi form (initialValues/helper seperti createDefaultXxxFormValues).
+    - src/components / src/pages -> komponen UI dan logic tampilan, tidak menyimpan interface/type.
 
 4) Console & Logging (Wajib)
 - Hindari console.log (cepat penuh log docker).
@@ -60,3 +66,32 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
   - Pencarian pakai `@change="refreshPage"` dan `@click:clear="refreshPage"`
   - Header table didefinisikan di file constant (contoh: `src/constants/user.constant.ts`)
   - Aksi penting (ubah status, hapus, dll.) pakai ConfirmDialog reusable
+
+14) Form Validation (Wajib)
+- Gunakan package `vee-validate` dan `yup` untuk validasi form.
+- Tentukan schema validasi yang jelas.
+- Pastikan unit test mencakup interaksi user mengisi/mengubah field sebelum submit.
+
+15) Struktur Direktori Project (Wajib dipahami)
+- Root:
+  - .trae/ -> konfigurasi Trae (rules & skill workflow).
+  - docker/ -> konfigurasi Docker (nginx, vue) untuk deployment.
+  - public/ -> asset statis yang di-serve langsung oleh Vite.
+  - src/ -> semua source code aplikasi frontend.
+  - tests/ -> file unit/integration test (Vitest).
+- Di dalam src/:
+  - src/api -> fungsi pemanggilan API ke backend (`*-service.ts`, `http.ts`).
+  - src/assets -> asset statis (gambar, logo) yang di-bundle oleh Vite.
+  - src/components -> komponen Vue reusable dan bagian halaman (misal: `site-config/*`, `user/*`).
+  - src/constants -> konstanta aplikasi (header table, layout navigation, dsb.).
+  - src/helper -> helper kecil yang spesifik (misalnya manipulasi nama).
+  - src/layouts -> layout global aplikasi (default, blank) yang membungkus `<router-view>`.
+  - src/model -> hanya interface/type untuk domain & payload API (tidak ada fungsi).
+  - src/pages -> file halaman yang terhubung ke route (users, login, site-configurations, dll).
+  - src/plugins -> inisialisasi plugin (Vuetify, Pinia, auto-import, dsb.).
+  - src/router -> konfigurasi router utama (route guard auth, dsb.).
+  - src/schemas -> schema validasi (yup) + konfigurasi form (initialValues/helper seperti `createDefaultXxxFormValues`).
+  - src/stores -> Pinia store (state global seperti auth, site-config, app).
+  - src/styles -> style global (SCSS, settings tema).
+  - src/utils -> util umum yang tidak spesifik domain (auth-cookie, navigation).
+  - App.vue, main.ts, typed-router.d.ts -> entry aplikasi dan konfigurasi router/auto-import.

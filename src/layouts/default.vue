@@ -84,6 +84,14 @@
 
   <AppFooter v-if="!isPublicLayout" />
 
+  <v-snackbar
+    v-model="snackbar.visible"
+    :color="snackbar.color"
+    :timeout="snackbar.timeout"
+  >
+    {{ snackbar.message }}
+  </v-snackbar>
+
   <ConfirmDialog
     v-model="showLogoutConfirm"
     cancel-text="Batal"
@@ -96,16 +104,23 @@
 </template>
 
 <script lang="ts" setup>
+  import { storeToRefs } from 'pinia'
   import { useRoute } from 'vue-router'
   import { useDisplay } from 'vuetify'
   import ConfirmDialog from '@/components/ConfirmDialog.vue'
   import { SIDEBAR_NAV_ITEMS } from '@/constants/layout.constant'
   import { getNameInitials } from '@/helper/name-initial'
+  import { useAppStore } from '@/stores/app'
   import { useAuthStore } from '@/stores/auth'
+  import { useSiteConfigStore } from '@/stores/site-config'
 
   const route = useRoute()
   const authStore = useAuthStore()
+  const appStore = useAppStore()
+  const siteConfigStore = useSiteConfigStore()
   const { smAndDown } = useDisplay()
+
+  const { snackbar } = storeToRefs(appStore)
 
   const drawer = ref(!smAndDown.value)
   const showLogoutConfirm = ref(false)
@@ -149,7 +164,28 @@
         //
       })
     }
+
+    if (!siteConfigStore.loaded) {
+      siteConfigStore.fetchSiteConfigs()
+    }
   })
+
+  watch(
+    () => route.path,
+    () => {
+      // If we are on public layout (login, 404, etc), reset theme
+      if (isPublicLayout.value) {
+        siteConfigStore.resetTheme()
+      } else if (siteConfigStore.loaded) {
+        // If coming back to authenticated pages and data is loaded, re-apply theme
+        siteConfigStore.updateTheme(siteConfigStore.system)
+      } else {
+        // If not loaded, fetch it
+        siteConfigStore.fetchSiteConfigs()
+      }
+    },
+    { immediate: true },
+  )
 
   watch(smAndDown, value => {
     if (value) {

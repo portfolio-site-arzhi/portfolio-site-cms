@@ -52,6 +52,29 @@ export default defineConfig(({ mode }) => {
         },
       }),
       Fonts({
+        custom: {
+          families: [],
+          preload: true,
+          linkFilter: tags => tags.filter(tag => {
+            if (tag.tag !== 'link') {
+              return true
+            }
+
+            const attrs = tag.attrs as Record<string, unknown> | undefined
+            const type = String(attrs?.type ?? '')
+            const href = String(attrs?.href ?? '')
+
+            if (href.includes('materialdesignicons-webfont')) {
+              return false
+            }
+
+            if (type === 'font/eot' || type === 'font/ttf') {
+              return false
+            }
+
+            return true
+          }),
+        },
         fontsource: {
           families: [
             {

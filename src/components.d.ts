@@ -11,13 +11,16 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AboutTab: typeof import('./components/site-config/AboutTab.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    ColorPickerInput: typeof import('./components/ColorPickerInput.vue')['default']
     ConfirmDialog: typeof import('./components/ConfirmDialog.vue')['default']
+    FooterTab: typeof import('./components/site-config/FooterTab.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    HomeTab: typeof import('./components/site-config/HomeTab.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    UserCreateDialog: typeof import('./components/UserCreateDialog.vue')['default']
-    UserEditDialog: typeof import('./components/UserEditDialog.vue')['default']
-    UserFormDialog: typeof import('./components/UserFormDialog.vue')['default']
+    SystemTab: typeof import('./components/site-config/SystemTab.vue')['default']
+    UserFormDialog: typeof import('./components/user/UserFormDialog.vue')['default']
   }
 }

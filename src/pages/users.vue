@@ -59,6 +59,20 @@
         >
           {{ loadError }}
         </v-alert>
+        <v-alert
+          v-if="formErrors.length > 0"
+          class="mb-4"
+          density="comfortable"
+          type="error"
+          variant="tonal"
+        >
+          <div
+            v-for="err in formErrors"
+            :key="err"
+          >
+            {{ err }}
+          </div>
+        </v-alert>
 
         <v-data-table-server
           v-model:items-per-page="itemsPerPage"
@@ -129,12 +143,14 @@
       v-model="createDialog"
       mode="create"
       @created="onUserCreated"
+      @failed="onFormFailed"
     />
 
     <UserFormDialog
       v-model="editDialog"
       mode="edit"
       :user="selectedUser"
+      @failed="onFormFailed"
       @updated="onUserUpdated"
     />
 
@@ -171,7 +187,7 @@
   import { useDisplay } from 'vuetify'
   import { deleteUserApi, fetchUserDetailApi, fetchUsersApi, updateUserStatusApi } from '@/api/user-service'
   import ConfirmDialog from '@/components/ConfirmDialog.vue'
-  import UserFormDialog from '@/components/UserFormDialog.vue'
+  import UserFormDialog from '@/components/user/UserFormDialog.vue'
   import { USERS_TABLE_HEADERS } from '@/constants/user.constant'
 
   const { smAndDown } = useDisplay()
@@ -181,6 +197,7 @@
   const loading = ref(false)
   const loadError = ref<string | null>(null)
   const search = ref('')
+  const formErrors = ref<string[]>([])
 
   const page = ref(1)
   const itemsPerPage = ref(10)
@@ -367,11 +384,17 @@
   }
 
   function onUserCreated (_user: User): void {
+    formErrors.value = []
     loadUsers()
   }
 
   function onUserUpdated (_user: User): void {
+    formErrors.value = []
     loadUsers()
+  }
+
+  function onFormFailed (errors: string[]): void {
+    formErrors.value = errors
   }
 
   function confirmStatusChange (): void {

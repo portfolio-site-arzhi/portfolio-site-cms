@@ -9,4 +9,9 @@ export const SIDEBAR_NAV_ITEMS = [
     icon: 'mdi-account-outline',
     to: '/users',
   },
+  {
+    title: 'Konfigurasi Website',
+    icon: 'mdi-cog-outline',
+    to: '/site-configurations',
+  },
 ]

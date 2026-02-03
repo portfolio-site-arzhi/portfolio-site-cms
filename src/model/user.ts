@@ -37,3 +37,9 @@ export interface UsersListMeta {
   order_field: 'email' | 'name' | 'status' | 'created_at' | 'updated_at' | null
   order_dir: 'asc' | 'desc' | null
 }
+
+export interface UserFormValues {
+  email: string
+  name: string
+  status: boolean
+}

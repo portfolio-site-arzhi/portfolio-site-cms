@@ -24,13 +24,10 @@ describe('Router auth guards', () => {
     authStoreMock.isLoggedIn = false
     readIsLoggedInCookieMock.mockReturnValue(false)
 
-    await router.push('/login')
+    await router.push('/')
   })
 
   it('mengalihkan ke /login jika mengakses /home tanpa login', async () => {
-    authStoreMock.isLoggedIn = false
-    readIsLoggedInCookieMock.mockReturnValue(false)
-
     await router.push('/home')
 
     expect(router.currentRoute.value.path).toBe('/login')
@@ -38,9 +35,7 @@ describe('Router auth guards', () => {
 
   it('mengalihkan ke /home jika sudah login dan mengakses /login', async () => {
     authStoreMock.isLoggedIn = true
-    readIsLoggedInCookieMock.mockReturnValue(false)
 
-    await router.push('/')
     await router.push('/login')
 
     expect(router.currentRoute.value.path).toBe('/home')
