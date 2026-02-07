@@ -43,6 +43,7 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
 8) UI/UX (Wajib)
 - Textfield gunakan density="compact".
 - Textfield readonly biasakan background warna abu-abu.
+- Untuk setiap input, wajib tambahkan attribute name yang stabil (untuk autocomplete & testing).
 - Tampilan harus responsif dan enak dilihat.
 
 9) Browser Console

@@ -189,8 +189,10 @@
   import ConfirmDialog from '@/components/ConfirmDialog.vue'
   import UserFormDialog from '@/components/user/UserFormDialog.vue'
   import { USERS_TABLE_HEADERS } from '@/constants/user.constant'
+  import { useAppStore } from '@/stores/app'
 
   const { smAndDown } = useDisplay()
+  const appStore = useAppStore()
 
   const users = ref<User[]>([])
   const usersMeta = ref<UsersListMeta | null>(null)
@@ -386,11 +388,13 @@
   function onUserCreated (_user: User): void {
     formErrors.value = []
     loadUsers()
+    appStore.showSuccess('Pengguna berhasil dibuat.')
   }
 
   function onUserUpdated (_user: User): void {
     formErrors.value = []
     loadUsers()
+    appStore.showSuccess('Pengguna berhasil diperbarui.')
   }
 
   function onFormFailed (errors: string[]): void {
@@ -411,6 +415,7 @@
       status: nextStatus,
     }).then(() => {
       loadUsers()
+      appStore.showSuccess('Status pengguna berhasil diperbarui.')
     }).catch(error => {
       console.error('Failed to update user status', error)
     }).finally(() => {
@@ -431,6 +436,7 @@
       deleteDialog.value = false
       selectedUser.value = null
       loadUsers()
+      appStore.showSuccess('Pengguna berhasil dihapus.')
     }).catch(error => {
       console.error('Failed to delete user', error)
     }).finally(() => {

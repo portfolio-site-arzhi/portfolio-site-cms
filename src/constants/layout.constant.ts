@@ -14,4 +14,9 @@ export const SIDEBAR_NAV_ITEMS = [
     icon: 'mdi-cog-outline',
     to: '/site-configurations',
   },
+  {
+    title: 'Experience',
+    icon: 'mdi-briefcase-outline',
+    to: '/experiences',
+  },
 ]

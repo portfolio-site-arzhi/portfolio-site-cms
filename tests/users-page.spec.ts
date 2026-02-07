@@ -11,6 +11,16 @@ vi.mock('vuetify', () => ({
   }),
 }))
 
+const { showSuccessMock } = vi.hoisted(() => ({
+  showSuccessMock: vi.fn(),
+}))
+
+vi.mock('@/stores/app', () => ({
+  useAppStore: () => ({
+    showSuccess: showSuccessMock,
+  }),
+}))
+
 const {
   fetchUsersApiMock,
   fetchUserDetailApiMock,
@@ -106,12 +116,7 @@ vi.mock('@/api/user-service', () => ({
 
 describe('UsersPage', () => {
   beforeEach(() => {
-    fetchUsersApiMock.mockClear()
-    fetchUserDetailApiMock.mockClear()
-    createUserApiMock.mockClear()
-    updateUserApiMock.mockClear()
-    updateUserStatusApiMock.mockClear()
-    deleteUserApiMock.mockClear()
+    vi.clearAllMocks()
   })
 
   it('menampilkan daftar pengguna di tabel', async () => {
@@ -195,6 +200,7 @@ describe('UsersPage', () => {
     await flushPromises()
 
     expect(fetchUsersApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Pengguna berhasil dibuat.')
   })
 
   it('memuat ulang daftar setelah pengguna diperbarui', async () => {
@@ -227,6 +233,7 @@ describe('UsersPage', () => {
     await flushPromises()
 
     expect(fetchUsersApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Pengguna berhasil diperbarui.')
   })
 
   it('memuat ulang daftar setelah status pengguna diubah', async () => {
@@ -265,6 +272,7 @@ describe('UsersPage', () => {
       status: false,
     })
     expect(fetchUsersApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Status pengguna berhasil diperbarui.')
   })
 
   it('memanggil API detail saat membuka dialog edit', async () => {
@@ -340,6 +348,7 @@ describe('UsersPage', () => {
 
     expect(deleteUserApiMock).toHaveBeenCalledWith(1)
     expect(fetchUsersApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Pengguna berhasil dihapus.')
   })
 })
 
