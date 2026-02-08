@@ -73,9 +73,7 @@
 
 <script lang="ts" setup>
   import type { User } from '@/model/user'
-  import { useForm } from 'vee-validate'
-  import { createUserApi, updateUserApi } from '@/api/user-service'
-  import { createDefaultUserFormValues, userSchema } from '@/schemas/user'
+  import { useUserFormDialog } from '@/logic/users/use-user-form-dialog'
 
   const props = defineProps<{
     modelValue: boolean
@@ -89,131 +87,25 @@
     (e: 'failed', errors: string[]): void
   }>()
 
-  const internalModel = computed({
-    get () {
-      return props.modelValue
-    },
-    set (value: boolean) {
-      emit('update:modelValue', value)
-    },
-  })
-
   const {
-    defineField,
+    internalModel,
     errors,
-    handleSubmit,
     isSubmitting,
-    resetForm,
     setValues,
-  } = useForm({
-    validationSchema: userSchema,
-    initialValues: createDefaultUserFormValues(),
+    email,
+    emailProps,
+    name,
+    nameProps,
+    status,
+    statusProps,
+    onCancel,
+    onSubmit,
+  } = useUserFormDialog({
+    props,
+    emit,
   })
 
-  const [email, emailProps] = defineField('email')
-  const [name, nameProps] = defineField('name')
-  const [status, statusProps] = defineField('status')
-
-  watch(
-    () => props.modelValue,
-    value => {
-      if (value) {
-        initializeForm()
-      }
-    },
-  )
-
-  watch(
-    () => props.user,
-    () => {
-      if (props.modelValue && props.mode === 'edit') {
-        initializeForm()
-      }
-    },
-  )
-
-  function initializeForm (): void {
-    if (props.mode === 'create') {
-      resetForm({
-        values: createDefaultUserFormValues(),
-      })
-      return
-    }
-
-    if (!props.user) {
-      resetForm({
-        values: createDefaultUserFormValues(),
-      })
-      return
-    }
-
-    setValues({
-      email: props.user.email,
-      name: props.user.name,
-      status: props.user.status,
-    })
-  }
-
-  function onCancel (): void {
-    internalModel.value = false
-  }
-
-  const onSubmit = handleSubmit(values => {
-    if (props.mode === 'create') {
-      return createUserApi({
-        email: values.email,
-        name: values.name,
-        status: values.status,
-      }).then(response => {
-        const createdUser = response.data.data
-
-        emit('created', createdUser)
-        internalModel.value = false
-      }).catch(error => {
-        console.error('Failed to save user', error)
-        emit('failed', extractFormErrors(error))
-      })
-    }
-
-    if (!props.user) {
-      return Promise.resolve()
-    }
-
-    const id = props.user.id
-
-    return updateUserApi(id, {
-      name: values.name,
-    }).then(response => {
-      const updatedUser = response.data.data
-
-      emit('updated', updatedUser)
-      internalModel.value = false
-    }).catch(error => {
-      console.error('Failed to save user', error)
-      emit('failed', extractFormErrors(error))
-    })
+  defineExpose({
+    setValues,
   })
-
-  function extractFormErrors (error: unknown): string[] {
-    if (typeof error !== 'object' || error === null) {
-      return ['Terjadi kesalahan saat menyimpan data pengguna.']
-    }
-
-    if (!('isAxiosError' in error)) {
-      return ['Terjadi kesalahan saat menyimpan data pengguna.']
-    }
-
-    const axiosError = error as { formErrors?: string[], response?: { data?: { errors?: string[] } } }
-
-    if (Array.isArray(axiosError.formErrors) && axiosError.formErrors.length > 0) {
-      return axiosError.formErrors
-    }
-
-    const data = axiosError.response?.data
-    if (data && Array.isArray(data.errors) && data.errors.length > 0) {
-      return data.errors
-    }
-
-    return ['Terjadi kesalahan saat menyimpan data pengguna.']
-  }
 </script>

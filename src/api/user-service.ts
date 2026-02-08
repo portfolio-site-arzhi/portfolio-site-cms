@@ -1,20 +1,13 @@
 import type { AxiosResponse } from 'axios'
 import type {
   CreateUserPayload,
+  FetchUsersParams,
   UpdateUserPayload,
   UpdateUserStatusPayload,
   UserDetailResponse,
   UsersListResponse,
 } from '@/model/user'
 import httpClient from '@/api/http'
-
-export interface FetchUsersParams {
-  page?: number
-  page_size?: number
-  search?: string | null
-  order_field?: 'email' | 'name' | 'status' | 'created_at' | 'updated_at'
-  order_dir?: 'asc' | 'desc'
-}
 
 export function fetchUsersApi (params?: FetchUsersParams): Promise<AxiosResponse<UsersListResponse>> {
   return httpClient.get<UsersListResponse>('/users', {

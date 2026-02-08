@@ -114,6 +114,8 @@ describe('ExperiencesPage', () => {
       global: {
         stubs: {
           teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
         },
       },
     })
@@ -130,7 +132,15 @@ describe('ExperiencesPage', () => {
   })
 
   it('memuat ulang daftar saat kata kunci pencarian berubah', async () => {
-    const wrapper = mount(ExperiencesPage)
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        stubs: {
+          teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
+        },
+      },
+    })
     await flushPromises()
 
     expect(fetchExperiencesApiMock).toHaveBeenCalledTimes(1)
@@ -152,7 +162,15 @@ describe('ExperiencesPage', () => {
   })
 
   it('mengosongkan input saat clear search dan memuat ulang data', async () => {
-    const wrapper = mount(ExperiencesPage)
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        stubs: {
+          teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
+        },
+      },
+    })
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -177,7 +195,15 @@ describe('ExperiencesPage', () => {
   })
 
   it('menampilkan snackbar sukses saat experience dibuat', async () => {
-    const wrapper = mount(ExperiencesPage)
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        stubs: {
+          teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
+        },
+      },
+    })
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -190,7 +216,15 @@ describe('ExperiencesPage', () => {
   })
 
   it('mengirim update sort saat tombol simpan ditekan', async () => {
-    const wrapper = mount(ExperiencesPage)
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        stubs: {
+          teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
+        },
+      },
+    })
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -217,7 +251,15 @@ describe('ExperiencesPage', () => {
   })
 
   it('mengubah status publish saat konfirmasi', async () => {
-    const wrapper = mount(ExperiencesPage)
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        stubs: {
+          teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
+        },
+      },
+    })
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -236,7 +278,15 @@ describe('ExperiencesPage', () => {
   })
 
   it('menghapus experience saat konfirmasi', async () => {
-    const wrapper = mount(ExperiencesPage)
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        stubs: {
+          teleport: true,
+          ExperienceDesktopTableCard: true,
+          ExperienceMobileListCard: true,
+        },
+      },
+    })
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {

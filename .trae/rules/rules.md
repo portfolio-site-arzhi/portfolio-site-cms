@@ -73,7 +73,20 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
 - Tentukan schema validasi yang jelas.
 - Pastikan unit test mencakup interaksi user mengisi/mengubah field sebelum submit.
 
-15) Struktur Direktori Project (Wajib dipahami)
+15) Pemisahan Logic vs Component (Wajib)
+- `src/pages` hanya untuk file route (`*.vue`) dan wiring UI halaman (sebisa mungkin tipis).
+- `src/components` hanya untuk UI reusable/potongan halaman; simpan logic yang benar-benar UI (misal computed label kecil, emit click, prop mapping).
+- `src/logic` untuk business logic/composable yang:
+  - Mengelola state halaman (loading/error/search/pagination/dialog/selected item).
+  - Memanggil API (`src/api`) dan mengatur success/error state.
+  - Melakukan mapping/normalisasi data payload (bukan UI).
+  - Dipakai ulang oleh lebih dari satu page/component, atau sudah membuat file `.vue` terlalu panjang.
+- Jangan pindahkan “UI logic kecil” ke `src/logic` jika hanya 1 computed sederhana dan tidak reusable (contoh: label tombol/menu).
+- Penamaan & lokasi:
+  - Simpan per fitur: `src/logic/<feature>/use-*.ts` (contoh: `src/logic/users/use-users-page.ts`, `src/logic/experiences/use-experiences-page.ts`).
+  - Satu composable fokus satu tanggung jawab; bila mulai membesar, pecah lagi.
+
+16) Struktur Direktori Project (Wajib dipahami)
 - Root:
   - .trae/ -> konfigurasi Trae (rules & skill workflow).
   - docker/ -> konfigurasi Docker (nginx, vue) untuk deployment.
@@ -87,6 +100,7 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
   - src/constants -> konstanta aplikasi (header table, layout navigation, dsb.).
   - src/helper -> helper kecil yang spesifik (misalnya manipulasi nama).
   - src/layouts -> layout global aplikasi (default, blank) yang membungkus `<router-view>`.
+  - src/logic -> composable/logic reusable untuk page & component (tanpa template/UI).
   - src/model -> hanya interface/type untuk domain & payload API (tidak ada fungsi).
   - src/pages -> file halaman yang terhubung ke route (users, login, site-configurations, dll).
   - src/plugins -> inisialisasi plugin (Vuetify, Pinia, auto-import, dsb.).

@@ -3,6 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ColorPickerInput from '../src/components/ColorPickerInput.vue'
 import ConfirmDialog from '../src/components/ConfirmDialog.vue'
+import HomeTab from '../src/components/site-config/HomeTab.vue'
 import SystemTab from '../src/components/site-config/SystemTab.vue'
 import SiteConfigurationsPage from '../src/pages/site-configurations.vue'
 import { useSiteConfigStore } from '../src/stores/site-config'
@@ -329,5 +330,102 @@ describe('SiteConfigurationsPage', () => {
       expect(nameField.exists()).toBe(true)
       expect(nameField.attributes('error-messages')).toBe('Nama wajib diisi')
     }
+  })
+
+  it('HomeTab: set status_file saat foto dipilih', async () => {
+    const createObjectURLMock = vi.fn(() => 'blob:preview')
+    const revokeObjectURLMock = vi.fn()
+
+    const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+
+    ;(URL as unknown as { createObjectURL: unknown }).createObjectURL = createObjectURLMock
+    ;(URL as unknown as { revokeObjectURL: unknown }).revokeObjectURL = revokeObjectURLMock
+
+    let model: {
+      name: string
+      position: string
+      description: { id: string, en: string }
+      photo: string | null
+      status_file?: number
+    } = {
+      name: 'Nama',
+      position: 'Posisi',
+      description: { id: 'ID', en: 'EN' },
+      photo: null,
+    }
+    let file: File | null = null
+
+    const wrapper = mount(HomeTab, {
+      props: {
+        'modelValue': model,
+        file,
+        'onUpdate:modelValue': (val: any) => {
+          model = val
+          wrapper.setProps({ modelValue: val })
+        },
+        'onUpdate:file': (val: any) => {
+          file = val
+          wrapper.setProps({ file: val })
+        },
+      },
+    })
+
+    const input = wrapper.get('input[type="file"]')
+    const selectedFile = new File(['x'], 'photo.png', { type: 'image/png' })
+
+    Object.defineProperty(input.element, 'files', {
+      value: [selectedFile],
+      configurable: true,
+    })
+
+    await input.trigger('change')
+    await flushPromises()
+
+    expect(file).toBe(selectedFile)
+    expect(model.status_file).toBe(1)
+    expect(createObjectURLMock).toHaveBeenCalled()
+
+    ;(URL as unknown as { createObjectURL: unknown }).createObjectURL = originalCreateObjectURL
+    ;(URL as unknown as { revokeObjectURL: unknown }).revokeObjectURL = originalRevokeObjectURL
+  })
+
+  it('HomeTab: hapus foto mengosongkan photo dan set status_file', async () => {
+    let model: {
+      name: string
+      position: string
+      description: { id: string, en: string }
+      photo: string | null
+      status_file?: number
+    } = {
+      name: 'Nama',
+      position: 'Posisi',
+      description: { id: 'ID', en: 'EN' },
+      photo: 'img.jpg',
+    }
+    let file: File | null = new File(['x'], 'photo.png', { type: 'image/png' })
+
+    const wrapper = mount(HomeTab, {
+      props: {
+        'modelValue': model,
+        file,
+        'onUpdate:modelValue': (val: any) => {
+          model = val
+          wrapper.setProps({ modelValue: val })
+        },
+        'onUpdate:file': (val: any) => {
+          file = val
+          wrapper.setProps({ file: val })
+        },
+      },
+    })
+
+    const deleteBtn = wrapper.get('v-btn')
+    await deleteBtn.trigger('click')
+    await flushPromises()
+
+    expect(file).toBeNull()
+    expect(model.photo).toBeNull()
+    expect(model.status_file).toBe(1)
   })
 })

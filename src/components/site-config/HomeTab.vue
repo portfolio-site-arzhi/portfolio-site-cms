@@ -184,100 +184,30 @@
 
 <script lang="ts" setup>
   import type { SiteConfigHomeValue } from '@/model/site-config'
+  import { useHomeTab } from '@/logic/site-config/use-home-tab'
 
   const modelValue = defineModel<SiteConfigHomeValue & {
     status_file?: number
   }>({ required: true })
 
   const file = defineModel<File | null>('file', { required: true })
-  const fileInput = ref<HTMLInputElement | null>(null)
-  const previewUrl = ref<string>('')
 
   const props = defineProps<{
     errors?: Record<string, string>
     validateField?: (path: string) => unknown
   }>()
 
-  const displayPhoto = computed(() => {
-    if (previewUrl.value) return previewUrl.value
-    if (modelValue.value.photo) return modelValue.value.photo
-    return ''
+  const {
+    fileInput,
+    displayPhoto,
+    triggerFileInput,
+    handleFileChange,
+    handleDeletePhoto,
+    updateSingle,
+    updateDescription,
+  } = useHomeTab({
+    modelValue,
+    file,
+    validateField: props.validateField,
   })
-
-  watch(() => file.value, newFile => {
-    if (newFile) {
-      if (previewUrl.value && previewUrl.value.startsWith('blob:')) {
-        URL.revokeObjectURL(previewUrl.value)
-      }
-      previewUrl.value = URL.createObjectURL(newFile)
-    } else {
-      if (previewUrl.value && previewUrl.value.startsWith('blob:')) {
-        URL.revokeObjectURL(previewUrl.value)
-      }
-      previewUrl.value = ''
-    }
-  })
-
-  onUnmounted(() => {
-    if (previewUrl.value && previewUrl.value.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrl.value)
-    }
-  })
-
-  function triggerFileInput () {
-    fileInput.value?.click()
-  }
-
-  function handleFileChange (event: Event) {
-    const target = event.target as HTMLInputElement
-    if (target.files && target.files.length > 0) {
-      const selectedFile = target.files[0]
-      if (selectedFile) {
-        file.value = selectedFile
-
-        // Update status_file to 1 (Change)
-        modelValue.value = {
-          ...modelValue.value,
-          status_file: 1,
-        }
-      }
-    }
-    // Clear input value to allow re-uploading the same file
-    target.value = ''
-  }
-
-  function handleDeletePhoto () {
-    file.value = null
-    previewUrl.value = ''
-
-    // Update status_file to 1 (Change/Delete) and clear photo URL
-    modelValue.value = {
-      ...modelValue.value,
-      status_file: 1,
-      photo: null,
-    }
-  }
-
-  function updateSingle (field: 'name' | 'position', value: string) {
-    modelValue.value = {
-      ...modelValue.value,
-      [field]: value,
-    }
-    if (props.validateField) {
-      props.validateField(`home.${field}`)
-    }
-  }
-
-  function updateDescription (locale: 'id' | 'en', value: string) {
-    modelValue.value = {
-      ...modelValue.value,
-      description: {
-        ...modelValue.value.description,
-        [locale]: value,
-      },
-    }
-    if (props.validateField) {
-      props.validateField(`home.description.${locale}`)
-    }
-  }
 </script>

@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import ExperienceFormDialog from '../src/components/experience/ExperienceFormDialog.vue'
+import ExperienceSkillsEditor from '../src/components/experience/ExperienceSkillsEditor.vue'
 
 const smAndDownMock = ref(false)
 
@@ -179,19 +180,20 @@ describe('ExperienceFormDialog', () => {
       },
     })
 
-    const vm = wrapper.vm as unknown as {
+    const skillsEditor = wrapper.findComponent(ExperienceSkillsEditor)
+    const skillsEditorVm = skillsEditor.vm as unknown as {
       openSkillDialog: () => void
       saveSkill: () => void
       skillName: string
-      skills: string[]
     }
 
-    vm.openSkillDialog()
-    vm.skillName = 'TypeScript'
-    vm.saveSkill()
+    skillsEditorVm.openSkillDialog()
+    skillsEditorVm.skillName = 'TypeScript'
+    skillsEditorVm.saveSkill()
 
     await flushPromises()
 
+    const vm = wrapper.vm as unknown as { skills: string[] }
     expect(vm.skills).toContain('TypeScript')
     expect(wrapper.html()).toContain('<v-table')
   })
@@ -214,16 +216,17 @@ describe('ExperienceFormDialog', () => {
       },
     })
 
-    const vm = wrapper.vm as unknown as {
+    const skillsEditor = wrapper.findComponent(ExperienceSkillsEditor)
+    const skillsEditorVm = skillsEditor.vm as unknown as {
       openSkillDialog: () => void
       saveSkill: () => void
       skillError: string | null
     }
 
-    vm.openSkillDialog()
-    vm.saveSkill()
+    skillsEditorVm.openSkillDialog()
+    skillsEditorVm.saveSkill()
 
-    expect(vm.skillError).toBe('Nama skill wajib diisi')
+    expect(skillsEditorVm.skillError).toBe('Nama skill wajib diisi')
   })
 
   it('menampilkan daftar skill versi mobile saat smAndDown aktif', async () => {
@@ -306,8 +309,6 @@ describe('ExperienceFormDialog', () => {
 
     const vm = wrapper.vm as unknown as {
       setValues: (values: any) => void
-      onSkillsDragEnd: () => void
-      skillsDraft: Array<{ id: number | null, skill_name: string }>
       onSubmit: () => Promise<void> | void
     }
 
@@ -325,12 +326,18 @@ describe('ExperienceFormDialog', () => {
       skills: ['TypeScript', 'Vue', 'Pinia'],
     })
 
-    vm.skillsDraft = [
+    const skillsEditor = wrapper.findComponent(ExperienceSkillsEditor)
+    const skillsEditorVm = skillsEditor.vm as unknown as {
+      onSkillsDragEnd: () => void
+      skillsDraft: Array<{ id: number | null, skill_name: string }>
+    }
+
+    skillsEditorVm.skillsDraft = [
       { id: 10, skill_name: 'Vue' },
       { id: 12, skill_name: 'TypeScript' },
       { id: 11, skill_name: 'Pinia' },
     ]
-    vm.onSkillsDragEnd()
+    skillsEditorVm.onSkillsDragEnd()
     await flushPromises()
 
     await vm.onSubmit()
@@ -366,16 +373,20 @@ describe('ExperienceFormDialog', () => {
     })
 
     const vm = wrapper.vm as unknown as {
-      openSkillDialog: () => void
-      saveSkill: () => void
-      skillName: string
       setValues: (values: any) => void
       onSubmit: () => Promise<void> | void
     }
 
-    vm.openSkillDialog()
-    vm.skillName = 'Vue'
-    vm.saveSkill()
+    const skillsEditor = wrapper.findComponent(ExperienceSkillsEditor)
+    const skillsEditorVm = skillsEditor.vm as unknown as {
+      openSkillDialog: () => void
+      saveSkill: () => void
+      skillName: string
+    }
+
+    skillsEditorVm.openSkillDialog()
+    skillsEditorVm.skillName = 'Vue'
+    skillsEditorVm.saveSkill()
 
     vm.setValues({
       role_id: 'Role ID',

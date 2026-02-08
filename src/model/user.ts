@@ -38,6 +38,21 @@ export interface UsersListMeta {
   order_dir: 'asc' | 'desc' | null
 }
 
+export type UsersOrderField = 'email' | 'name' | 'status' | 'created_at' | 'updated_at'
+
+export type UsersSortByItem = {
+  key: UsersOrderField
+  order?: 'asc' | 'desc'
+}
+
+export interface FetchUsersParams {
+  page?: number
+  page_size?: number
+  search?: string | null
+  order_field?: UsersOrderField
+  order_dir?: 'asc' | 'desc'
+}
+
 export interface UserFormValues {
   email: string
   name: string
