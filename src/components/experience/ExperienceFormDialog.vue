@@ -73,31 +73,31 @@
 
           <v-col cols="12" md="4">
             <v-text-field
-              v-model="year_start"
+              v-model="start_date"
               density="compact"
-              :error-messages="errors.year_start ? [errors.year_start] : []"
-              label="Tahun Mulai (opsional)"
-              name="experience_year_start"
-              placeholder="2023"
-              type="number"
+              :error-messages="errors.start_date ? [errors.start_date] : []"
+              label="Bulan Mulai (opsional)"
+              name="experience_start_date"
+              placeholder="2023-08"
+              type="month"
               variant="outlined"
-              v-bind="yearStartProps"
+              v-bind="startDateProps"
             />
           </v-col>
 
           <v-col cols="12" md="4">
             <v-text-field
-              v-model="year_end"
+              v-model="end_date"
               :bg-color="is_current ? 'grey-lighten-3' : undefined"
               density="compact"
               :disabled="is_current"
-              :error-messages="errors.year_end ? [errors.year_end] : []"
-              label="Tahun Selesai (opsional)"
-              name="experience_year_end"
-              placeholder="2025"
-              type="number"
+              :error-messages="errors.end_date ? [errors.end_date] : []"
+              label="Bulan Selesai (opsional)"
+              name="experience_end_date"
+              placeholder="2024-07"
+              type="month"
               variant="outlined"
-              v-bind="yearEndProps"
+              v-bind="endDateProps"
             />
           </v-col>
 
@@ -193,10 +193,10 @@
     companyNameProps,
     company_url,
     companyUrlProps,
-    year_start,
-    yearStartProps,
-    year_end,
-    yearEndProps,
+    start_date,
+    startDateProps,
+    end_date,
+    endDateProps,
     is_current,
     isCurrentProps,
     description_id,

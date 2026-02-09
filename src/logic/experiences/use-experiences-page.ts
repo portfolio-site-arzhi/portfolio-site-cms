@@ -246,13 +246,35 @@ export function useExperiencesPage () {
     })
   }
 
+  function formatMonthYear (value: string | null): string {
+    if (!value) {
+      return '—'
+    }
+
+    const match = /^(\d{4})-(\d{2})-\d{2}$/.exec(value)
+    if (!match) {
+      return '—'
+    }
+
+    const monthIndex = Number(match[2])
+    const year = match[1]
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+    const label = months[monthIndex - 1]
+    if (!label) {
+      return '—'
+    }
+
+    return `${label} ${year}`
+  }
+
   function formatYears (experience: Experience): string {
-    const start = experience.year_start === null ? '—' : String(experience.year_start)
+    const start = formatMonthYear(experience.start_date)
     if (experience.is_current) {
       return `${start} - Sekarang`
     }
 
-    const end = experience.year_end === null ? '—' : String(experience.year_end)
+    const end = formatMonthYear(experience.end_date)
     return `${start} - ${end}`
   }
 

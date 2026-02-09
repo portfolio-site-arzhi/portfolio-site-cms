@@ -12,8 +12,8 @@ export interface Experience {
   role_en: string
   company_name: string
   company_url: string | null
-  year_start: number | null
-  year_end: number | null
+  start_date: string | null
+  end_date: string | null
   is_current: boolean
   description_id: string
   description_en: string
@@ -44,8 +44,8 @@ export interface CreateExperiencePayload {
   role_en: string
   company_name: string
   company_url?: string | null
-  year_start?: number | null
-  year_end?: number | null
+  start_date?: string | null
+  end_date?: string | null
   is_current: boolean
   description_id: string
   description_en: string
@@ -58,8 +58,8 @@ export interface UpdateExperiencePayload {
   role_en?: string
   company_name?: string
   company_url?: string | null
-  year_start?: number | null
-  year_end?: number | null
+  start_date?: string | null
+  end_date?: string | null
   is_current?: boolean
   description_id?: string
   description_en?: string
@@ -81,8 +81,8 @@ export interface ExperienceFormValues {
   role_en: string
   company_name: string
   company_url: string
-  year_start: string
-  year_end: string
+  start_date: string
+  end_date: string
   is_current: boolean
   description_id: string
   description_en: string

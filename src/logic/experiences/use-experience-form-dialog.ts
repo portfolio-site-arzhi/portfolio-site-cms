@@ -44,8 +44,8 @@ export function useExperienceFormDialog (options: {
   const [role_en, roleEnProps] = defineField('role_en')
   const [company_name, companyNameProps] = defineField('company_name')
   const [company_url, companyUrlProps] = defineField('company_url')
-  const [year_start, yearStartProps] = defineField('year_start')
-  const [year_end, yearEndProps] = defineField('year_end')
+  const [start_date, startDateProps] = defineField('start_date')
+  const [end_date, endDateProps] = defineField('end_date')
   const [is_current, isCurrentProps] = defineField('is_current')
   const [description_id] = defineField('description_id')
   const [description_en] = defineField('description_en')
@@ -53,8 +53,8 @@ export function useExperienceFormDialog (options: {
 
   watch(is_current, value => {
     if (value) {
-      year_end.value = ''
-      validateField('year_end')
+      end_date.value = ''
+      validateField('end_date')
     }
   })
 
@@ -84,16 +84,41 @@ export function useExperienceFormDialog (options: {
     return trimmed
   }
 
-  function toNullableYear (value: string): number | null {
+  function toNullableMonthDate (value: string): string | null {
     const trimmed = value.trim()
     if (trimmed.length === 0) {
       return null
     }
-    const numeric = Number(trimmed)
-    if (!Number.isFinite(numeric)) {
+
+    const match = /^(\d{4})-(\d{2})$/.exec(trimmed)
+    if (!match) {
       return null
     }
-    return Math.trunc(numeric)
+
+    const year = Number(match[1])
+    const month = Number(match[2])
+    if (!Number.isFinite(year) || !Number.isFinite(month)) {
+      return null
+    }
+    if (year < 1900 || year > 2100) {
+      return null
+    }
+    if (month < 1 || month > 12) {
+      return null
+    }
+
+    return `${match[1]}-${match[2]}-01`
+  }
+
+  function toMonthInputValue (value: string | null): string {
+    if (!value) {
+      return ''
+    }
+    const match = /^(\d{4})-(\d{2})-\d{2}$/.exec(value)
+    if (!match) {
+      return ''
+    }
+    return `${match[1]}-${match[2]}`
   }
 
   function normalizeSkills (value: string[]): Array<{ skill_name: string }> {
@@ -149,12 +174,8 @@ export function useExperienceFormDialog (options: {
       role_en: options.props.experience.role_en,
       company_name: options.props.experience.company_name,
       company_url: options.props.experience.company_url ?? '',
-      year_start: options.props.experience.year_start === null
-        ? ''
-        : String(options.props.experience.year_start),
-      year_end: options.props.experience.year_end === null
-        ? ''
-        : String(options.props.experience.year_end),
+      start_date: toMonthInputValue(options.props.experience.start_date),
+      end_date: toMonthInputValue(options.props.experience.end_date),
       is_current: options.props.experience.is_current,
       description_id: options.props.experience.description_id,
       description_en: options.props.experience.description_en,
@@ -173,8 +194,8 @@ export function useExperienceFormDialog (options: {
       role_en: values.role_en.trim(),
       company_name: values.company_name.trim(),
       company_url: toNullableString(values.company_url),
-      year_start: toNullableYear(values.year_start),
-      year_end: values.is_current ? null : toNullableYear(values.year_end),
+      start_date: toNullableMonthDate(values.start_date),
+      end_date: values.is_current ? null : toNullableMonthDate(values.end_date),
       is_current: values.is_current,
       description_id: values.description_id,
       description_en: values.description_en,
@@ -251,10 +272,10 @@ export function useExperienceFormDialog (options: {
     companyNameProps,
     company_url,
     companyUrlProps,
-    year_start,
-    yearStartProps,
-    year_end,
-    yearEndProps,
+    start_date,
+    startDateProps,
+    end_date,
+    endDateProps,
     is_current,
     isCurrentProps,
     description_id,

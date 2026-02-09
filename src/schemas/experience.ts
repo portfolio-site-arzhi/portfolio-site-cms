@@ -13,18 +13,31 @@ function isEmpty (value: unknown): boolean {
   return value.trim().length === 0
 }
 
-function parseOptionalYear (value: string): number | null {
+function parseOptionalMonthValue (value: string): number | null {
   const trimmed = value.trim()
   if (trimmed.length === 0) {
     return null
   }
 
-  const numeric = Number(trimmed)
-  if (!Number.isFinite(numeric)) {
+  const match = /^(\d{4})-(\d{2})$/.exec(trimmed)
+  if (!match) {
     return null
   }
 
-  return Math.trunc(numeric)
+  const year = Number(match[1])
+  const month = Number(match[2])
+
+  if (!Number.isFinite(year) || !Number.isFinite(month)) {
+    return null
+  }
+  if (year < 1900 || year > 2100) {
+    return null
+  }
+  if (month < 1 || month > 12) {
+    return null
+  }
+
+  return year * 12 + month
 }
 
 export const experienceSchema: yup.ObjectSchema<ExperienceFormValues> = yup.object({
@@ -48,20 +61,15 @@ export const experienceSchema: yup.ObjectSchema<ExperienceFormValues> = yup.obje
       return false
     }
   }),
-  year_start: yup.string().defined().test('year-start', 'Tahun mulai tidak valid', value => {
+  start_date: yup.string().defined().test('start-date', 'Bulan mulai tidak valid', value => {
     if (!value || value.trim().length === 0) {
       return true
     }
-    const numeric = Number(value)
-    if (!Number.isFinite(numeric)) {
-      return false
-    }
-    const year = Math.trunc(numeric)
-    return year >= 1900 && year <= 2100
+    return parseOptionalMonthValue(value) !== null
   }),
-  year_end: yup.string().defined().test('year-end', 'Tahun selesai tidak valid', (value, context) => {
+  end_date: yup.string().defined().test('end-date', 'Bulan selesai tidak valid', (value, context) => {
     const parent = context.parent as ExperienceFormValues
-    const { is_current, year_start } = parent
+    const { is_current, start_date } = parent
 
     if (is_current) {
       return !value || value.trim().length === 0
@@ -71,18 +79,13 @@ export const experienceSchema: yup.ObjectSchema<ExperienceFormValues> = yup.obje
       return true
     }
 
-    const endNumeric = Number(value)
-    if (!Number.isFinite(endNumeric)) {
+    const endMonthValue = parseOptionalMonthValue(value)
+    if (endMonthValue === null) {
       return false
     }
 
-    const endYear = Math.trunc(endNumeric)
-    if (endYear < 1900 || endYear > 2100) {
-      return false
-    }
-
-    const startYear = parseOptionalYear(year_start)
-    if (startYear !== null && endYear < startYear) {
+    const startMonthValue = parseOptionalMonthValue(start_date)
+    if (startMonthValue !== null && endMonthValue < startMonthValue) {
       return false
     }
 
@@ -103,8 +106,8 @@ export function createDefaultExperienceFormValues (): ExperienceFormValues {
     role_en: '',
     company_name: '',
     company_url: '',
-    year_start: '',
-    year_end: '',
+    start_date: '',
+    end_date: '',
     is_current: false,
     description_id: '<p></p>',
     description_en: '<p></p>',
