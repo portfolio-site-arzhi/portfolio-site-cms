@@ -1,81 +1,99 @@
-# Vuetify (Default)
+# Portfolio Site CMS
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+CMS admin panel untuk mengelola konten portfolio (users, experiences, educations, certifications, dan site configuration).
 
-## ❗️ Important Links
+## Tech Stack
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
+- Vue 3
+- Vuetify 3
+- Vite 7
+- TypeScript
+- Pinia
+- Vue Router
+- Axios
+- Vitest + Vue Test Utils
+- ESLint
 
-## 💿 Install
+## Requirements
 
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
+- Node.js `24.11.1` (lihat `.nvmrc`)
+- npm (direkomendasikan versi terbaru yang kompatibel dengan Node 24)
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+## Quick Start
 
-After completing the installation, your environment is ready for Vuetify development.
-
-## ✨ Features
-
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts-next for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts-next](https://github.com/loicduong/vite-plugin-vue-layouts-next)
-- 💻 **Enhanced Development Experience**: Benefit from TypeScript's static type checking and the ESLint plugin suite for Vue, ensuring code quality and consistency. [TypeScript](https://www.typescriptlang.org/) | [ESLint Plugin Vue](https://eslint.vuejs.org/)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
-- 🛠️ **Strongly-Typed Vue**: Use vue-tsc for type-checking your Vue components, and enjoy a robust development experience. [vue-tsc](https://github.com/johnsoncodehk/volar/tree/master/packages/vue-tsc)
-
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
-
-## 💡 Usage
-
-This section covers how to start the development server and build your project for production.
-
-### Starting the Development Server
-
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
+1. Install dependency:
 
 ```bash
-yarn dev
+npm install
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
-
-> Add NODE_OPTIONS='--no-warnings' to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
-
-### Building for Production
-
-To build your project for production, use:
+2. Jalankan aplikasi:
 
 ```bash
-yarn build
+npm run dev
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+Catatan: konfigurasi environment dikelola internal.
 
-Once the build process is completed, your application will be ready for deployment in a production environment.
+## Available Scripts
 
-## 💪 Support Vuetify Development
+| Script | Description |
+|---|---|
+| `npm run dev` | Jalankan Vite dev server |
+| `npm run build` | Build production (termasuk type check) |
+| `npm run build-only` | Build production tanpa type check |
+| `npm run preview` | Preview hasil build |
+| `npm run type-check` | Jalankan pengecekan tipe TypeScript/Vue |
+| `npm run lint` | Jalankan ESLint dengan auto-fix |
+| `npm run test:run` | Jalankan unit test (Vitest) |
 
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
+## Quality Checks
 
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+Gunakan perintah ini sebelum merge:
 
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
+```bash
+npm run type-check
+npm run lint
+npm run test:run
+```
 
-Copyright (c) 2016-present Vuetify, LLC
+## Docker
+
+Build dan jalankan container:
+
+```bash
+docker compose up --build -d
+```
+
+Stop container:
+
+```bash
+docker compose down
+```
+
+Setelah berjalan, aplikasi tersedia di `http://localhost:3001`.
+
+## Troubleshooting
+
+- Aplikasi tidak bisa login atau data kosong: pastikan backend berjalan dan konfigurasi environment internal sudah benar.
+- Port bentrok: sesuaikan konfigurasi internal dan restart dev server.
+- Error dependency: hapus `node_modules` dan jalankan ulang `npm install`.
+
+## Project Structure
+
+```text
+src/
+  api/         # API service layer
+  components/  # Reusable UI components
+  constants/   # App constants
+  logic/       # Feature/page composables
+  model/       # Domain types/interfaces
+  pages/       # Route pages
+  plugins/     # Plugin registration
+  router/      # Router + navigation guard
+  schemas/     # Validation schemas
+  stores/      # Pinia stores
+  utils/       # Generic utilities
+tests/         # Unit/integration tests
+docker/        # Dockerfile + nginx config
+```
