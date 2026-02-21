@@ -26,6 +26,7 @@ declare module 'vue-router/auto-routes' {
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/site-configurations': RouteRecordInfo<'/site-configurations', '/site-configurations', Record<never, never>, Record<never, never>>,
+    '/skills': RouteRecordInfo<'/skills', '/skills', Record<never, never>, Record<never, never>>,
     '/users': RouteRecordInfo<'/users', '/users', Record<never, never>, Record<never, never>>,
   }
 
@@ -70,6 +71,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/site-configurations.vue': {
       routes: '/site-configurations'
+      views: never
+    }
+    'src/pages/skills.vue': {
+      routes: '/skills'
       views: never
     }
     'src/pages/users.vue': {

@@ -29,4 +29,9 @@ export const SIDEBAR_NAV_ITEMS = [
     icon: 'mdi-certificate-outline',
     to: '/certifications',
   },
+  {
+    title: 'Skills',
+    icon: 'mdi-star-outline',
+    to: '/skills',
+  },
 ]
