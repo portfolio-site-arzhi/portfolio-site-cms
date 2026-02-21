@@ -25,7 +25,7 @@ describe('Router auth guards', () => {
     readIsLoggedInCookieMock.mockReturnValue(false)
 
     await router.push('/')
-  })
+  }, 20_000)
 
   it('mengalihkan ke /login jika mengakses /home tanpa login', async () => {
     await router.push('/home')

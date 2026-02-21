@@ -19,4 +19,14 @@ export const SIDEBAR_NAV_ITEMS = [
     icon: 'mdi-briefcase-outline',
     to: '/experiences',
   },
+  {
+    title: 'Education',
+    icon: 'mdi-school-outline',
+    to: '/educations',
+  },
+  {
+    title: 'Certifications',
+    icon: 'mdi-certificate-outline',
+    to: '/certifications',
+  },
 ]
