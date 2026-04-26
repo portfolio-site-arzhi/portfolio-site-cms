@@ -143,6 +143,71 @@ describe('PortfolioFormDialog', () => {
     }, imageFile)
   })
 
+  it('mengirim data ke API saat membuat portfolio tanpa gambar', async () => {
+    const wrapper = mount(PortfolioFormDialog, {
+      props: {
+        modelValue: true,
+        mode: 'create',
+      },
+      global: {
+        stubs: {
+          RichTextEditor: {
+            props: ['modelValue'],
+            emits: ['update:modelValue'],
+            template: '<div />',
+          },
+          teleport: true,
+        },
+      },
+    })
+
+    const vm = wrapper.vm as unknown as {
+      setValues: (values: unknown) => void
+      onSubmit: () => Promise<void> | void
+    }
+
+    vm.setValues({
+      title: 'Internal Notification Service',
+      description: 'Service internal untuk notifikasi multi channel',
+      description_en: 'Internal service for multi-channel notifications',
+      contribution: '<p>Membangun arsitektur service dan queue worker</p>',
+      contribution_en: '<p>Built service architecture and queue workers</p>',
+      outcome: '<p>Mempercepat pengiriman notifikasi sistem</p>',
+      outcome_en: '<p>Improved system notification delivery speed</p>',
+      role: 'Backend Engineer',
+      live_url: '',
+      github_url: 'https://github.com/example/internal-notification-service',
+      is_published: true,
+      published_at: '2026-04-24T16:00',
+      stacks: [
+        { id: null, name: 'Node.js' },
+        { id: null, name: 'Redis' },
+      ],
+    })
+
+    await vm.onSubmit()
+    await flushPromises()
+
+    expect(createPortfolioApiMock).toHaveBeenCalledWith({
+      title: 'Internal Notification Service',
+      description: 'Service internal untuk notifikasi multi channel',
+      description_en: 'Internal service for multi-channel notifications',
+      contribution: '<p>Membangun arsitektur service dan queue worker</p>',
+      contribution_en: '<p>Built service architecture and queue workers</p>',
+      outcome: '<p>Mempercepat pengiriman notifikasi sistem</p>',
+      outcome_en: '<p>Improved system notification delivery speed</p>',
+      role: 'Backend Engineer',
+      live_url: null,
+      github_url: 'https://github.com/example/internal-notification-service',
+      is_published: true,
+      published_at: new Date('2026-04-24T16:00').toISOString(),
+      stacks: [
+        { name: 'Node.js' },
+        { name: 'Redis' },
+      ],
+    }, null)
+  })
+
   it('mengirim status_file 1 tanpa file saat gambar dihapus pada mode edit', async () => {
     const existingPortfolio = {
       id: 7,

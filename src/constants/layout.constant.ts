@@ -39,4 +39,9 @@ export const SIDEBAR_NAV_ITEMS = [
     icon: 'mdi-folder-multiple-image',
     to: '/portfolios',
   },
+  {
+    title: 'Export Dokumen',
+    icon: 'mdi-file-pdf-box',
+    to: '/exports',
+  },
 ]

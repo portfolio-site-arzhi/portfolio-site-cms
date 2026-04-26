@@ -48,7 +48,7 @@ const portfolioStackSchema = yup.object({
   name: yup.string().required('Nama stack wajib diisi').max(120, 'Nama stack maksimal 120 karakter'),
 })
 
-export function createPortfolioSchema (mode: 'create' | 'edit'): yup.ObjectSchema<PortfolioFormValues> {
+export function createPortfolioSchema (_mode: 'create' | 'edit'): yup.ObjectSchema<PortfolioFormValues> {
   return yup.object({
     title: yup.string().required('Judul project wajib diisi').max(200, 'Judul project maksimal 200 karakter'),
     description: yup.string().required('Deskripsi (ID) wajib diisi'),
@@ -66,14 +66,11 @@ export function createPortfolioSchema (mode: 'create' | 'edit'): yup.ObjectSchem
       'Tanggal publish tidak valid',
       value => isValidOptionalDateTime(value ?? ''),
     ),
-    image_file: yup.mixed<File>().nullable().defined().test('image-required', 'Gambar project wajib diunggah', (value, context) => {
-      if (mode !== 'create') {
-        return true
-      }
-
-      const parent = context.parent as PortfolioFormValues
-      return value instanceof File || typeof parent.image_url === 'string'
-    }).test('image-type', 'Format gambar harus JPG, PNG, atau WebP', value => isSupportedImageType(value ?? null)),
+    image_file: yup.mixed<File>().nullable().defined().test(
+      'image-type',
+      'Format gambar harus JPG, PNG, atau WebP',
+      value => isSupportedImageType(value ?? null),
+    ),
     image_url: yup.string().nullable().defined(),
     status_file: yup.mixed<0 | 1>().oneOf([0, 1]).required(),
     stacks: yup.array().of(portfolioStackSchema).defined(),

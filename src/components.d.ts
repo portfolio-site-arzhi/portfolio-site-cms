@@ -30,6 +30,7 @@ declare module 'vue' {
     ExperienceMobileListCard: typeof import('./components/experience/ExperienceMobileListCard.vue')['default']
     ExperienceSkillDialog: typeof import('./components/experience/ExperienceSkillDialog.vue')['default']
     ExperienceSkillsEditor: typeof import('./components/experience/ExperienceSkillsEditor.vue')['default']
+    ExportActionCard: typeof import('./components/export/ExportActionCard.vue')['default']
     FooterTab: typeof import('./components/site-config/FooterTab.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HomeTab: typeof import('./components/site-config/HomeTab.vue')['default']

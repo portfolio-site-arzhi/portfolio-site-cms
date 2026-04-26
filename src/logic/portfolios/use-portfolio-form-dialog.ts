@@ -262,12 +262,7 @@ export function usePortfolioFormDialog (options: {
     }
 
     if (options.props.mode === 'create') {
-      if (!values.image_file) {
-        options.emit('failed', ['Gambar project wajib diunggah.'])
-        return Promise.resolve()
-      }
-
-      return createPortfolioApi(payload, values.image_file).then(response => {
+      return createPortfolioApi(payload, values.image_file ?? null).then(response => {
         options.emit('created', response.data.data)
         internalModel.value = false
       }).catch(error => {

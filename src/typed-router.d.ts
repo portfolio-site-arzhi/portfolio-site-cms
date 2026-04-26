@@ -23,6 +23,7 @@ declare module 'vue-router/auto-routes' {
     '/certifications': RouteRecordInfo<'/certifications', '/certifications', Record<never, never>, Record<never, never>>,
     '/educations': RouteRecordInfo<'/educations', '/educations', Record<never, never>, Record<never, never>>,
     '/experiences': RouteRecordInfo<'/experiences', '/experiences', Record<never, never>, Record<never, never>>,
+    '/exports': RouteRecordInfo<'/exports', '/exports', Record<never, never>, Record<never, never>>,
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/portfolios': RouteRecordInfo<'/portfolios', '/portfolios', Record<never, never>, Record<never, never>>,
@@ -60,6 +61,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/experiences.vue': {
       routes: '/experiences'
+      views: never
+    }
+    'src/pages/exports.vue': {
+      routes: '/exports'
       views: never
     }
     'src/pages/home.vue': {

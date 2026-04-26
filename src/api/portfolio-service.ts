@@ -21,12 +21,15 @@ export function fetchPortfolioDetailApi (id: number): Promise<AxiosResponse<Port
 
 export function createPortfolioApi (
   payload: CreatePortfolioPayload,
-  imageFile: File,
+  imageFile?: File | null,
 ): Promise<AxiosResponse<PortfolioDetailResponse>> {
   const formData = new FormData()
 
   formData.append('payload', JSON.stringify(payload))
-  formData.append('image', imageFile)
+
+  if (imageFile) {
+    formData.append('image', imageFile)
+  }
 
   return httpClient.post<PortfolioDetailResponse>('/portfolios', formData, {
     headers: {
