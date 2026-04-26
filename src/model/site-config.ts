@@ -18,6 +18,7 @@ export interface SiteConfigHomeValue {
 export interface SiteConfigAboutValue {
   about_me: MultiLangString
   email: string
+  address: string
 }
 
 export interface SiteConfigFooterValue {

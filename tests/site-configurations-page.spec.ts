@@ -50,6 +50,7 @@ const mockResponse = {
           en: 'About EN',
         },
         email: 'test@example.com',
+        address: 'Jakarta, Indonesia',
       },
       footer: {
         github: 'https://github.com',
@@ -138,6 +139,7 @@ describe('SiteConfigurationsPage', () => {
     expect(vm.form.about.about_me.id).toBe('About ID')
     expect(vm.form.about.about_me.en).toBe('About EN')
     expect(vm.form.about.email).toBe('test@example.com')
+    expect(vm.form.about.address).toBe('Jakarta, Indonesia')
 
     expect(vm.form.footer.github).toBe('https://github.com')
     expect(vm.form.footer.linkedin).toBe('https://linkedin.com')
@@ -168,6 +170,7 @@ describe('SiteConfigurationsPage', () => {
               en: 'About EN',
             },
             email: 'test@example.com',
+            address: 'Jakarta, Indonesia',
           },
           footer: {
             github: 'https://github.com',
@@ -197,6 +200,7 @@ describe('SiteConfigurationsPage', () => {
               about: {
                 about_me: { id: 'About ID', en: 'About EN' },
                 email: 'test@example.com',
+                address: 'Jakarta, Indonesia',
               },
               footer: {
                 github: 'https://github.com',
@@ -260,6 +264,7 @@ describe('SiteConfigurationsPage', () => {
         // 5. Check if the payload has the updated value
         const lastCallArgs = saveSiteConfigsBulkApiMock.mock.calls[0][0]
         expect(lastCallArgs.system.primary_color).toBe('#FF0000')
+        expect(lastCallArgs.about.address).toBe('Jakarta, Indonesia')
       }
     }
   })
@@ -284,6 +289,7 @@ describe('SiteConfigurationsPage', () => {
               about: {
                 about_me: { id: 'About ID', en: 'About EN' },
                 email: 'test@example.com',
+                address: 'Jakarta, Indonesia',
               },
               footer: {
                 github: 'https://github.com',

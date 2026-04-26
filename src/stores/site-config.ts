@@ -27,6 +27,7 @@ export const useSiteConfigStore = defineStore('site-config', () => {
       en: '',
     },
     email: '',
+    address: '',
   })
 
   const footer = ref<SiteConfigFooterValue>({
@@ -78,6 +79,7 @@ export const useSiteConfigStore = defineStore('site-config', () => {
               en: data.about.about_me.en,
             },
             email: data.about.email,
+            address: data.about.address,
           }
         }
 

@@ -35,6 +35,7 @@ export function saveSiteConfigsBulkApi (payload: SiteConfigBulkPayload, file?: F
           en: payload.about.about_me.en,
         },
         email: payload.about.email,
+        address: payload.about.address,
       },
     },
     footer: {

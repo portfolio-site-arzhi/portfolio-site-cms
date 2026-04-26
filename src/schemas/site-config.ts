@@ -22,6 +22,7 @@ export const siteConfigSchema = yup.object({
       en: yup.string().required('About me is required'),
     }),
     email: yup.string().email('Email tidak valid').required('Email wajib diisi'),
+    address: yup.string().required('Alamat wajib diisi'),
   }),
   footer: yup.object({
     github: yup.string().url('URL tidak valid').required('Github URL wajib diisi'),
@@ -52,6 +53,7 @@ export function createDefaultSiteConfigFormValues (): SiteConfigFormValues {
         en: '',
       },
       email: '',
+      address: '',
     },
     footer: {
       github: '',

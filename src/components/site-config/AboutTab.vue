@@ -19,6 +19,16 @@
           variant="outlined"
           @update:model-value="val => updateEmail(val)"
         />
+        <v-text-field
+          density="compact"
+          :error-messages="errors?.['about.address']"
+          label="Alamat"
+          :model-value="modelValue.address"
+          name="about_address"
+          prepend-inner-icon="mdi-map-marker"
+          variant="outlined"
+          @update:model-value="val => updateAddress(val)"
+        />
       </v-card-text>
     </v-card>
 
@@ -95,6 +105,16 @@
     }
     if (props.validateField) {
       props.validateField('about.email')
+    }
+  }
+
+  function updateAddress (value: string) {
+    modelValue.value = {
+      ...modelValue.value,
+      address: value,
+    }
+    if (props.validateField) {
+      props.validateField('about.address')
     }
   }
 

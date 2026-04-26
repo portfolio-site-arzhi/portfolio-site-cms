@@ -49,6 +49,7 @@ export function useSiteConfigurationsPage () {
   defineField('home.description.en')
 
   defineField('about.email')
+  defineField('about.address')
   defineField('about.about_me.id')
   defineField('about.about_me.en')
 
@@ -79,6 +80,7 @@ export function useSiteConfigurationsPage () {
             en: siteConfigStore.about.about_me.en,
           },
           email: siteConfigStore.about.email,
+          address: siteConfigStore.about.address,
         },
         footer: {
           github: siteConfigStore.footer.github,
