@@ -13,14 +13,14 @@
       <RichTextEditor
         v-model="internalDescriptionId"
         :error-messages="props.descriptionIdError ? [props.descriptionIdError] : []"
-        label="Deskripsi (ID)"
+        :label="props.labelId ?? 'Deskripsi (ID)'"
       />
     </v-window-item>
     <v-window-item value="en">
       <RichTextEditor
         v-model="internalDescriptionEn"
         :error-messages="props.descriptionEnError ? [props.descriptionEnError] : []"
-        label="Deskripsi (EN)"
+        :label="props.labelEn ?? 'Deskripsi (EN)'"
       />
     </v-window-item>
   </v-window>
@@ -35,6 +35,8 @@
     descriptionEn: string
     descriptionIdError: string | null
     descriptionEnError: string | null
+    labelId?: string
+    labelEn?: string
   }>()
 
   const emit = defineEmits<{

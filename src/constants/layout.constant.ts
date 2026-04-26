@@ -34,4 +34,9 @@ export const SIDEBAR_NAV_ITEMS = [
     icon: 'mdi-star-outline',
     to: '/skills',
   },
+  {
+    title: 'Portfolio',
+    icon: 'mdi-folder-multiple-image',
+    to: '/portfolios',
+  },
 ]

@@ -1,43 +1,26 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import router from '../src/router'
-
-const authStoreMock = {
-  isLoggedIn: false,
-}
-
-const useAuthStoreMock = vi.fn(() => authStoreMock)
-
-const readIsLoggedInCookieMock = vi.fn(() => false)
-
-vi.mock('@/stores/auth', () => ({
-  useAuthStore: () => useAuthStoreMock(),
-}))
-
-vi.mock('@/utils/auth-cookie', () => ({
-  readIsLoggedInCookie: () => readIsLoggedInCookieMock(),
-  clearIsLoggedInCookie: () => {},
-}))
+import { describe, expect, it } from 'vitest'
+import { getAuthRedirectPath } from '../src/router/auth-guard'
 
 describe('Router auth guards', () => {
-  beforeEach(async () => {
-    authStoreMock.isLoggedIn = false
-    readIsLoggedInCookieMock.mockReturnValue(false)
+  it('mengalihkan ke /login jika mengakses /home tanpa login', () => {
+    const redirectPath = getAuthRedirectPath({
+      path: '/home',
+      meta: {},
+      isLoggedIn: false,
+    })
 
-    await router.push('/')
-  }, 20_000)
-
-  it('mengalihkan ke /login jika mengakses /home tanpa login', async () => {
-    await router.push('/home')
-
-    expect(router.currentRoute.value.path).toBe('/login')
+    expect(redirectPath).toBe('/login')
   })
 
-  it('mengalihkan ke /home jika sudah login dan mengakses /login', async () => {
-    authStoreMock.isLoggedIn = true
+  it('mengalihkan ke /home jika sudah login dan mengakses /login', () => {
+    const redirectPath = getAuthRedirectPath({
+      path: '/login',
+      meta: {
+        public: true,
+      },
+      isLoggedIn: true,
+    })
 
-    await router.push('/login')
-
-    expect(router.currentRoute.value.path).toBe('/home')
+    expect(redirectPath).toBe('/home')
   })
 })

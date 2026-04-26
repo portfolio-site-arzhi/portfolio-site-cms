@@ -25,6 +25,7 @@ declare module 'vue-router/auto-routes' {
     '/experiences': RouteRecordInfo<'/experiences', '/experiences', Record<never, never>, Record<never, never>>,
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/portfolios': RouteRecordInfo<'/portfolios', '/portfolios', Record<never, never>, Record<never, never>>,
     '/site-configurations': RouteRecordInfo<'/site-configurations', '/site-configurations', Record<never, never>, Record<never, never>>,
     '/skills': RouteRecordInfo<'/skills', '/skills', Record<never, never>, Record<never, never>>,
     '/users': RouteRecordInfo<'/users', '/users', Record<never, never>, Record<never, never>>,
@@ -67,6 +68,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/login.vue': {
       routes: '/login'
+      views: never
+    }
+    'src/pages/portfolios.vue': {
+      routes: '/portfolios'
       views: never
     }
     'src/pages/site-configurations.vue': {
