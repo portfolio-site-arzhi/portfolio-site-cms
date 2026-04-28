@@ -65,6 +65,14 @@ Build dan jalankan container:
 docker compose up --build -d
 ```
 
+Untuk VPS production dengan override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
+
+Compose sekarang membangun asset frontend langsung di stage `builder` internal lalu menyalinnya ke image `nginx`, jadi tidak membutuhkan image build terpisah.
+
 Stop container:
 
 ```bash
