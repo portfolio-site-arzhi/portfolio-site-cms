@@ -24,3 +24,19 @@ export function getAuthRedirectPath (options: {
 
   return null
 }
+
+export function shouldRestoreSessionForRoute (options: {
+  path: string
+  meta: Record<string | number | symbol, unknown>
+  isLoggedIn: boolean
+  sessionResolved: boolean
+}): boolean {
+  if (options.isLoggedIn || options.sessionResolved) {
+    return false
+  }
+
+  const guestOnly = isGuestOnlyRoute(options.path)
+  const publicRoute = isPublicRoute(options.meta)
+
+  return guestOnly || !publicRoute
+}

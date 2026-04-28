@@ -8,7 +8,10 @@ import { setupLayouts } from 'virtual:generated-layouts'
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
-import { getAuthRedirectPath } from '@/router/auth-guard'
+import {
+  getAuthRedirectPath,
+  shouldRestoreSessionForRoute,
+} from '@/router/auth-guard'
 import { useAuthStore } from '@/stores/auth'
 import { readIsLoggedInCookie } from '@/utils/auth-cookie'
 
@@ -20,14 +23,37 @@ const router = createRouter({
 router.beforeEach(to => {
   const authStore = useAuthStore()
   const isLoggedIn = authStore.isLoggedIn || readIsLoggedInCookie()
-  const redirectPath = getAuthRedirectPath({
+  const shouldRestoreSession = shouldRestoreSessionForRoute({
+    path: to.path,
+    meta: to.meta,
+    isLoggedIn,
+    sessionResolved: authStore.sessionResolved,
+  })
+
+  if (shouldRestoreSession) {
+    return authStore.restoreSession().then(restoredIsLoggedIn => {
+      const resolvedRedirectPath = getAuthRedirectPath({
+        path: to.path,
+        meta: to.meta,
+        isLoggedIn: restoredIsLoggedIn,
+      })
+
+      if (resolvedRedirectPath) {
+        return { path: resolvedRedirectPath }
+      }
+
+      return true
+    })
+  }
+
+  const currentRedirectPath = getAuthRedirectPath({
     path: to.path,
     meta: to.meta,
     isLoggedIn,
   })
 
-  if (redirectPath) {
-    return { path: redirectPath }
+  if (currentRedirectPath) {
+    return { path: currentRedirectPath }
   }
 
   return true

@@ -79,6 +79,43 @@ describe('AuthStore', () => {
     expect(store.isLoggedIn).toBe(true)
     expect(store.profile).not.toBeNull()
     expect(store.profile?.email).toBe('user@example.com')
+    expect(store.sessionResolved).toBe(true)
+  })
+
+  it('restoreSession memulihkan sesi backend meski cookie login frontend tidak tersedia', async () => {
+    readIsLoggedInCookieMock.mockReturnValue(false)
+
+    const store = useAuthStore()
+
+    const restored = await store.restoreSession()
+
+    expect(restored).toBe(true)
+    expect(fetchProfileApiMock).toHaveBeenCalled()
+    expect(store.isLoggedIn).toBe(true)
+    expect(store.profile?.email).toBe('user@example.com')
+    expect(store.sessionResolved).toBe(true)
+    expect(routerPushMock).not.toHaveBeenCalled()
+  })
+
+  it('restoreSession menandai logout saat sesi backend tidak valid', async () => {
+    readIsLoggedInCookieMock.mockReturnValue(false)
+    fetchProfileApiMock.mockRejectedValueOnce({
+      isAxiosError: true,
+      response: {
+        status: 401,
+      },
+    })
+
+    const store = useAuthStore()
+
+    const restored = await store.restoreSession()
+
+    expect(restored).toBe(false)
+    expect(store.isLoggedIn).toBe(false)
+    expect(store.profile).toBeNull()
+    expect(store.sessionResolved).toBe(true)
+    expect(clearIsLoggedInCookieMock).toHaveBeenCalled()
+    expect(routerPushMock).not.toHaveBeenCalled()
   })
 
   it('logout menghapus status login dan mengarahkan ke /login', async () => {

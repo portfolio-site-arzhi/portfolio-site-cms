@@ -9,6 +9,7 @@ export interface AuthState {
   isLoggedIn: boolean
   loadingProfile: boolean
   profile: UserProfile | null
+  sessionResolved: boolean
 }
 
 export interface ProfileResponse {
