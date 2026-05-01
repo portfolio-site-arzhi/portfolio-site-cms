@@ -172,6 +172,90 @@ describe('SkillFormDialog', () => {
     }))
   })
 
+  it('mengubah nama skill lewat dialog edit sebelum submit', async () => {
+    const wrapper = mount(SkillFormDialog, {
+      props: {
+        modelValue: true,
+        mode: 'create',
+      },
+      global: {
+        stubs: {
+          teleport: true,
+        },
+      },
+    })
+
+    const vm = wrapper.vm as unknown as {
+      setValues: (values: any) => void
+      onSubmit: () => Promise<void> | void
+    }
+
+    vm.setValues({
+      name: 'Frontend',
+      is_active: true,
+      skills: ['Vue.js', 'TypeScript'],
+    })
+    await flushPromises()
+
+    const skillsEditor = wrapper.findComponent(SkillItemsEditor)
+    const skillsEditorVm = skillsEditor.vm as unknown as {
+      openEditSkillDialog: (index: number) => void
+      saveSkill: () => void
+      skillName: string
+    }
+
+    skillsEditorVm.openEditSkillDialog(0)
+    skillsEditorVm.skillName = 'Nuxt'
+    skillsEditorVm.saveSkill()
+    await flushPromises()
+
+    await vm.onSubmit()
+    await flushPromises()
+
+    expect(createSkillApiMock).toHaveBeenLastCalledWith({
+      name: 'Frontend',
+      is_active: true,
+      skills: [{ name: 'Nuxt' }, { name: 'TypeScript' }],
+    })
+  })
+
+  it('menolak edit skill menjadi nama yang sudah ada', async () => {
+    const wrapper = mount(SkillFormDialog, {
+      props: {
+        modelValue: true,
+        mode: 'create',
+      },
+      global: {
+        stubs: {
+          teleport: true,
+        },
+      },
+    })
+
+    const vm = wrapper.vm as unknown as {
+      setValues: (values: any) => void
+    }
+
+    vm.setValues({
+      skills: ['Vue.js', 'Nuxt'],
+    })
+    await flushPromises()
+
+    const skillsEditor = wrapper.findComponent(SkillItemsEditor)
+    const skillsEditorVm = skillsEditor.vm as unknown as {
+      openEditSkillDialog: (index: number) => void
+      saveSkill: () => void
+      skillName: string
+      skillError: string | null
+    }
+
+    skillsEditorVm.openEditSkillDialog(0)
+    skillsEditorVm.skillName = 'Nuxt'
+    skillsEditorVm.saveSkill()
+
+    expect(skillsEditorVm.skillError).toBe('Skill sudah ada')
+  })
+
   it('menolak skill kosong dan menampilkan pesan error', async () => {
     const wrapper = mount(SkillFormDialog, {
       props: {

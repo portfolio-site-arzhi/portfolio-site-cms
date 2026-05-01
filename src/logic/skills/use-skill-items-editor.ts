@@ -13,11 +13,13 @@ export function useSkillItemsEditor (options: {
   const skillDialog = ref(false)
   const skillName = ref('')
   const skillError = ref<string | null>(null)
+  const editingSkillIndex = ref<number | null>(null)
 
   const skillsDraft = ref<SkillItemDraft[]>([])
   const isSyncingModel = ref(false)
 
   const isSkillsSortDisabled = computed(() => options.props.disabled)
+  const skillDialogTitle = computed(() => editingSkillIndex.value === null ? 'Tambah Skill' : 'Edit Skill')
 
   watch(
     () => options.props.modelValue,
@@ -63,7 +65,19 @@ export function useSkillItemsEditor (options: {
 
   function openSkillDialog (): void {
     skillError.value = null
+    editingSkillIndex.value = null
     skillName.value = ''
+    skillDialog.value = true
+  }
+
+  function openEditSkillDialog (index: number): void {
+    if (index < 0 || index >= skillsDraft.value.length) {
+      return
+    }
+
+    skillError.value = null
+    editingSkillIndex.value = index
+    skillName.value = skillsDraft.value[index]?.name ?? ''
     skillDialog.value = true
   }
 
@@ -83,12 +97,14 @@ export function useSkillItemsEditor (options: {
   function closeSkillDialog (): void {
     skillDialog.value = false
     skillError.value = null
+    editingSkillIndex.value = null
     skillName.value = ''
   }
 
   function saveSkill (): void {
     const raw = String(skillName.value ?? '')
     const normalized = raw.trim()
+    const currentEditingIndex = editingSkillIndex.value
 
     if (normalized.length === 0) {
       skillError.value = 'Nama skill wajib diisi'
@@ -100,13 +116,33 @@ export function useSkillItemsEditor (options: {
       return
     }
 
-    const existing = skillsDraft.value.map(s => s.name.trim().toLowerCase())
-    if (existing.includes(normalized.toLowerCase())) {
+    const isDuplicateSkill = skillsDraft.value.some((skill, index) => {
+      return index !== currentEditingIndex && skill.name.trim().toLowerCase() === normalized.toLowerCase()
+    })
+
+    if (isDuplicateSkill) {
       skillError.value = 'Skill sudah ada'
       return
     }
 
-    skillsDraft.value = [...skillsDraft.value, { id: null, name: normalized }]
+    if (currentEditingIndex === null) {
+      skillsDraft.value = [...skillsDraft.value, { id: null, name: normalized }]
+    } else {
+      const currentSkill = skillsDraft.value[currentEditingIndex]
+
+      if (!currentSkill) {
+        closeSkillDialog()
+        return
+      }
+
+      const next = skillsDraft.value.slice()
+      next[currentEditingIndex] = {
+        id: currentSkill.id,
+        name: normalized,
+      }
+      skillsDraft.value = next
+    }
+
     skillError.value = null
     emitModelFromDraft()
     closeSkillDialog()
@@ -145,7 +181,9 @@ export function useSkillItemsEditor (options: {
     skillError,
     skillsDraft,
     isSkillsSortDisabled,
+    skillDialogTitle,
     openSkillDialog,
+    openEditSkillDialog,
     onSkillDialogUpdate,
     onSkillNameUpdate,
     saveSkill,

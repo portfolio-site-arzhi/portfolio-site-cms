@@ -15,7 +15,7 @@
             <v-icon icon="mdi-close" />
           </v-btn>
           <v-toolbar-title class="text-subtitle-1">
-            Tambah Skill
+            {{ props.title }}
           </v-toolbar-title>
           <v-spacer />
           <v-btn
@@ -55,6 +55,7 @@
 <script lang="ts" setup>
   const props = defineProps<{
     modelValue: boolean
+    title: string
     skillName: string
     skillError: string | null
     isSubmitting: boolean

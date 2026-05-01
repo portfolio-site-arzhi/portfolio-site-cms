@@ -52,16 +52,29 @@
                 </div>
               </div>
 
-              <v-btn
-                :data-test="`remove-skill-item-${index}`"
-                :disabled="props.disabled"
-                icon
-                size="small"
-                variant="text"
-                @click="removeSkillAt(index)"
-              >
-                <v-icon icon="mdi-delete-outline" />
-              </v-btn>
+              <div class="d-flex align-center ga-1">
+                <v-btn
+                  :data-test="`edit-skill-item-${index}`"
+                  :disabled="props.disabled"
+                  icon
+                  size="small"
+                  variant="text"
+                  @click="openEditSkillDialog(index)"
+                >
+                  <v-icon icon="mdi-pencil-outline" />
+                </v-btn>
+
+                <v-btn
+                  :data-test="`remove-skill-item-${index}`"
+                  :disabled="props.disabled"
+                  icon
+                  size="small"
+                  variant="text"
+                  @click="removeSkillAt(index)"
+                >
+                  <v-icon icon="mdi-delete-outline" />
+                </v-btn>
+              </div>
             </div>
           </template>
         </draggable>
@@ -77,7 +90,7 @@
             <th>
               Skill
             </th>
-            <th style="width: 72px" />
+            <th style="width: 108px" />
           </tr>
         </thead>
         <tbody v-if="skillsDraft.length === 0">
@@ -117,16 +130,29 @@
                 {{ element.name }}
               </td>
               <td class="text-right">
-                <v-btn
-                  :data-test="`remove-skill-item-${index}`"
-                  :disabled="props.disabled"
-                  icon
-                  size="small"
-                  variant="text"
-                  @click="removeSkillAt(index)"
-                >
-                  <v-icon icon="mdi-delete-outline" />
-                </v-btn>
+                <div class="d-inline-flex align-center ga-1">
+                  <v-btn
+                    :data-test="`edit-skill-item-${index}`"
+                    :disabled="props.disabled"
+                    icon
+                    size="small"
+                    variant="text"
+                    @click="openEditSkillDialog(index)"
+                  >
+                    <v-icon icon="mdi-pencil-outline" />
+                  </v-btn>
+
+                  <v-btn
+                    :data-test="`remove-skill-item-${index}`"
+                    :disabled="props.disabled"
+                    icon
+                    size="small"
+                    variant="text"
+                    @click="removeSkillAt(index)"
+                  >
+                    <v-icon icon="mdi-delete-outline" />
+                  </v-btn>
+                </div>
               </td>
             </tr>
           </template>
@@ -147,6 +173,7 @@
       :model-value="skillDialog"
       :skill-error="skillError"
       :skill-name="skillName"
+      :title="skillDialogTitle"
       @save="saveSkill"
       @update:model-value="onSkillDialogUpdate"
       @update:skill-name="onSkillNameUpdate"
@@ -179,7 +206,9 @@
     skillError,
     skillsDraft,
     isSkillsSortDisabled,
+    skillDialogTitle,
     openSkillDialog,
+    openEditSkillDialog,
     onSkillDialogUpdate,
     onSkillNameUpdate,
     saveSkill,
