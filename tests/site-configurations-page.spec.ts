@@ -434,4 +434,20 @@ describe('SiteConfigurationsPage', () => {
     expect(model.photo).toBeNull()
     expect(model.status_file).toBe(1)
   })
+
+  it('HomeTab: menampilkan info ukuran file maksimal 5 MB', () => {
+    const wrapper = mount(HomeTab, {
+      props: {
+        modelValue: {
+          name: 'Nama',
+          position: 'Posisi',
+          description: { id: 'ID', en: 'EN' },
+          photo: null,
+        },
+        file: null,
+      },
+    })
+
+    expect(wrapper.text()).toContain('Ukuran file maksimal 5 MB')
+  })
 })

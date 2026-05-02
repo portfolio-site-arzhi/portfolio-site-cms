@@ -29,7 +29,7 @@
           Gambar Project
         </div>
         <div class="text-body-2 text-medium-emphasis mb-4">
-          Gambar project bersifat opsional. Format yang didukung: JPG, PNG, atau WebP. Rekomendasi ukuran 1022x540 pixel.
+          Gambar project bersifat opsional. Format yang didukung: JPG, PNG, atau WebP. Ukuran file maksimal 5 MB. Rekomendasi ukuran 1022x540 pixel.
         </div>
 
         <div class="d-flex flex-wrap ga-2">

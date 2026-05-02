@@ -410,4 +410,25 @@ describe('PortfolioFormDialog', () => {
       outcome_en: '<p>Portfolio module outcome</p>',
     }), imageFile)
   })
+
+  it('menampilkan info ukuran file maksimal 5 MB pada upload gambar', () => {
+    const wrapper = mount(PortfolioFormDialog, {
+      props: {
+        modelValue: true,
+        mode: 'create',
+      },
+      global: {
+        stubs: {
+          RichTextEditor: {
+            props: ['modelValue'],
+            emits: ['update:modelValue'],
+            template: '<div />',
+          },
+          teleport: true,
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Ukuran file maksimal 5 MB')
+  })
 })

@@ -63,14 +63,16 @@
       </v-btn>
 
       <div class="text-caption text-medium-emphasis mt-2 text-center">
-        Allowed extensions: .jpg, .jpeg, .png, .webp<br>
-        Recommended size: 300x300px
+        Format yang didukung: JPG, JPEG, PNG, WebP<br>
+        Ukuran file maksimal 5 MB<br>
+        Rekomendasi ukuran 300x300px
       </div>
 
       <input
         ref="fileInput"
         accept="image/jpeg,image/png,image/webp"
         class="d-none"
+        name="home_photo"
         type="file"
         @change="handleFileChange"
       >
