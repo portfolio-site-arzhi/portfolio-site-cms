@@ -11,13 +11,15 @@ vi.mock('vuetify', () => ({
   }),
 }))
 
-const { showSuccessMock } = vi.hoisted(() => ({
+const { showSuccessMock, showErrorMock } = vi.hoisted(() => ({
   showSuccessMock: vi.fn(),
+  showErrorMock: vi.fn(),
 }))
 
 vi.mock('@/stores/app', () => ({
   useAppStore: () => ({
     showSuccess: showSuccessMock,
+    showError: showErrorMock,
   }),
 }))
 
@@ -74,6 +76,8 @@ const {
   updateSkillApiMock,
   deleteSkillApiMock,
   updateSkillsSortApiMock,
+  exportSkillsApiMock,
+  importSkillsApiMock,
 } = vi.hoisted(() => ({
   fetchSkillsApiMock: vi.fn(() => Promise.resolve({
     data: {
@@ -99,6 +103,17 @@ const {
       message: 'Sort updated',
     },
   })),
+  exportSkillsApiMock: vi.fn(() => Promise.resolve({
+    data: new Blob(['skills export']),
+    headers: {
+      'content-disposition': 'attachment; filename="skills-export.xlsx"',
+    },
+  })),
+  importSkillsApiMock: vi.fn(() => Promise.resolve({
+    data: {
+      message: 'Import skill berhasil',
+    },
+  })),
 }))
 
 vi.mock('@/api/skill-service', () => ({
@@ -107,6 +122,21 @@ vi.mock('@/api/skill-service', () => ({
   updateSkillApi: updateSkillApiMock,
   deleteSkillApi: deleteSkillApiMock,
   updateSkillsSortApi: updateSkillsSortApiMock,
+  exportSkillsApi: exportSkillsApiMock,
+  importSkillsApi: importSkillsApiMock,
+}))
+
+const {
+  extractAttachmentFileNameMock,
+  triggerBrowserDownloadMock,
+} = vi.hoisted(() => ({
+  extractAttachmentFileNameMock: vi.fn(() => 'skills-export.xlsx'),
+  triggerBrowserDownloadMock: vi.fn(),
+}))
+
+vi.mock('@/utils/browser-download', () => ({
+  extractAttachmentFileName: extractAttachmentFileNameMock,
+  triggerBrowserDownload: triggerBrowserDownloadMock,
 }))
 
 describe('SkillsPage', () => {
@@ -114,16 +144,27 @@ describe('SkillsPage', () => {
     vi.clearAllMocks()
   })
 
-  it('memuat daftar skill saat mount', async () => {
-    const wrapper = mount(SkillsPage, {
+  function createWrapper () {
+    return mount(SkillsPage, {
       global: {
+        config: {
+          compilerOptions: {
+            isCustomElement: tag => tag.startsWith('v-'),
+          },
+        },
         stubs: {
           teleport: true,
+          ConfirmDialog: true,
+          SkillFormDialog: true,
           SkillDesktopTableCard: true,
           SkillMobileListCard: true,
         },
       },
     })
+  }
+
+  it('memuat daftar skill saat mount', async () => {
+    const wrapper = createWrapper()
 
     await flushPromises()
 
@@ -136,16 +177,23 @@ describe('SkillsPage', () => {
     expect(vm.skillGroups).toHaveLength(2)
   })
 
+  it('menampilkan search full-width di atas tombol aksi dengan name stabil', async () => {
+    const wrapper = createWrapper()
+
+    await flushPromises()
+
+    const html = wrapper.html()
+
+    expect(html).toContain('name="skills_search"')
+    expect(html).toContain('class="d-flex flex-wrap ga-3"')
+    expect(html).not.toContain('flex-sm-row')
+    expect(html).toContain('skill_groups.code')
+    expect(html).toContain('skills.group_code')
+    expect(html).toContain('membaca <strong>code</strong> dan <strong>group_code</strong> dalam lowercase')
+  })
+
   it('memuat ulang daftar saat kata kunci pencarian berubah', async () => {
-    const wrapper = mount(SkillsPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          SkillDesktopTableCard: true,
-          SkillMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     expect(fetchSkillsApiMock).toHaveBeenCalledTimes(1)
@@ -167,15 +215,7 @@ describe('SkillsPage', () => {
   })
 
   it('mengirim update sort saat tombol simpan ditekan', async () => {
-    const wrapper = mount(SkillsPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          SkillDesktopTableCard: true,
-          SkillMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -202,15 +242,7 @@ describe('SkillsPage', () => {
   })
 
   it('mengubah status aktif saat konfirmasi', async () => {
-    const wrapper = mount(SkillsPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          SkillDesktopTableCard: true,
-          SkillMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -229,15 +261,7 @@ describe('SkillsPage', () => {
   })
 
   it('menghapus skill group saat konfirmasi', async () => {
-    const wrapper = mount(SkillsPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          SkillDesktopTableCard: true,
-          SkillMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -251,5 +275,78 @@ describe('SkillsPage', () => {
     await flushPromises()
 
     expect(deleteSkillApiMock).toHaveBeenCalledWith(1)
+  })
+
+  it('mengunduh file export skills', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      exportSkillsTemplate: () => void
+    }
+
+    vm.exportSkillsTemplate()
+
+    await flushPromises()
+
+    expect(exportSkillsApiMock).toHaveBeenCalledTimes(1)
+    expect(extractAttachmentFileNameMock).toHaveBeenCalledTimes(1)
+    expect(triggerBrowserDownloadMock).toHaveBeenCalledTimes(1)
+    expect(showSuccessMock).toHaveBeenCalledWith('File Excel skills berhasil diunduh.')
+  })
+
+  it('membuka dialog import lalu mengirim file hanya setelah dikonfirmasi', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      importDialog: boolean
+      importErrorMessage: string | null
+      openImportDialog: () => void
+      selectImportFile: (file: File | null) => void
+      confirmImportSkills: () => void
+    }
+    const file = new File(['xlsx-content'], 'skills-import.xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+
+    vm.openImportDialog()
+    vm.selectImportFile(file)
+
+    expect(vm.importDialog).toBe(true)
+    expect(importSkillsApiMock).not.toHaveBeenCalled()
+
+    vm.confirmImportSkills()
+
+    await flushPromises()
+
+    expect(importSkillsApiMock).toHaveBeenCalledWith(file)
+    expect(fetchSkillsApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Import skill berhasil')
+  })
+
+  it('menahan import jika file bukan xlsx', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      importErrorMessage: string | null
+      openImportDialog: () => void
+      selectImportFile: (file: File | null) => void
+      confirmImportSkills: () => void
+    }
+    const invalidFile = new File(['csv-content'], 'skills-import.csv', {
+      type: 'text/csv',
+    })
+
+    vm.openImportDialog()
+    vm.selectImportFile(invalidFile)
+    vm.confirmImportSkills()
+
+    await flushPromises()
+
+    expect(vm.importErrorMessage).toBe('File yang diunggah harus berformat .xlsx.')
+    expect(importSkillsApiMock).not.toHaveBeenCalled()
+    expect(showErrorMock).not.toHaveBeenCalled()
   })
 })

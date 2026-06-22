@@ -17,22 +17,53 @@
           </div>
         </div>
 
-        <div class="d-flex flex-column flex-sm-row">
+        <div class="mb-3">
           <v-text-field
             v-model="search"
-            class="mb-3 mb-sm-0 mr-sm-4"
             clearable
             density="compact"
             hide-details
+            name="skills_search"
             placeholder="Cari skill"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             @change="refreshPage"
             @click:clear="refreshPage"
           />
+        </div>
+
+        <div class="d-flex flex-wrap ga-3">
+          <v-btn
+            color="primary"
+            data-test="export-skills"
+            :disabled="importLoading"
+            :loading="exportLoading"
+            variant="outlined"
+            @click="exportSkillsTemplate"
+          >
+            <v-icon
+              icon="mdi-download"
+              start
+            />
+            Sample Excel
+          </v-btn>
 
           <v-btn
-            class="align-self-sm-start mb-3 mb-sm-0 mr-sm-3"
+            color="primary"
+            data-test="import-skills"
+            :disabled="exportLoading"
+            :loading="importLoading"
+            variant="outlined"
+            @click="openImportDialog"
+          >
+            <v-icon
+              icon="mdi-upload"
+              start
+            />
+            Import Excel
+          </v-btn>
+
+          <v-btn
             color="primary"
             data-test="save-sort"
             :disabled="isSortDisabled"
@@ -48,7 +79,6 @@
           </v-btn>
 
           <v-btn
-            class="align-self-sm-start"
             color="primary"
             data-test="add-skill-group"
             variant="flat"
@@ -61,6 +91,18 @@
             Tambah
           </v-btn>
         </div>
+
+        <v-alert
+          class="mt-3 mb-0"
+          data-test="skills-import-note"
+          density="comfortable"
+          type="info"
+          variant="tonal"
+        >
+          Catatan import: <strong>skill_groups.code</strong> dan <strong>skills.group_code</strong>
+          harus mengacu ke kode yang sama. Spasi pada field code akan diabaikan, lalu sistem
+          membaca <strong>code</strong> dan <strong>group_code</strong> dalam lowercase.
+        </v-alert>
       </v-col>
     </v-row>
 
@@ -161,6 +203,16 @@
       @updated="onSkillUpdated"
     />
 
+    <SkillImportDialog
+      v-model="importDialog"
+      :error-message="importErrorMessage"
+      :loading="importLoading"
+      :selected-file="selectedImportFile"
+      @clear-file="clearSelectedImportFile"
+      @confirm="confirmImportSkills"
+      @select-file="selectImportFile"
+    />
+
     <ConfirmDialog
       v-model="deleteDialog"
       cancel-text="Batal"
@@ -188,6 +240,7 @@
   import ConfirmDialog from '@/components/ConfirmDialog.vue'
   import SkillDesktopTableCard from '@/components/skill/SkillDesktopTableCard.vue'
   import SkillFormDialog from '@/components/skill/SkillFormDialog.vue'
+  import SkillImportDialog from '@/components/skill/SkillImportDialog.vue'
   import SkillMobileListCard from '@/components/skill/SkillMobileListCard.vue'
   import { useSkillsPage } from '@/logic/skills/use-skills-page'
 
@@ -201,6 +254,11 @@
     formErrors,
     sortLoading,
     sortError,
+    exportLoading,
+    importLoading,
+    importDialog,
+    selectedImportFile,
+    importErrorMessage,
     createDialog,
     editDialog,
     deleteDialog,
@@ -214,7 +272,6 @@
     statusDialogTitle,
     statusDialogMessage,
     refreshPage,
-    loadSkillGroups,
     openCreateDialog,
     openEditDialog,
     openDeleteDialog,
@@ -227,10 +284,11 @@
     onDragStart,
     onDragEnd,
     saveSort,
+    exportSkillsTemplate,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImportSkills,
     formatSkillsPreview,
   } = useSkillsPage()
-
-  onMounted(() => {
-    loadSkillGroups()
-  })
 </script>

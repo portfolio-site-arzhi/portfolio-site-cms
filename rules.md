@@ -15,6 +15,7 @@ ATURAN WAJIB (dibaca sebelum mulai coding)
 - Lebih baik punya banyak file yang penting dan spesifik, dengan nama file yang jelas
   merepresentasikan fitur/tanggung jawabnya (misal: site-config.store.ts, home-tab.vue).
 - Hindari 1 file besar yang berisi banyak komponen/flow/fitur yang tidak related.
+- kalau ada script yang sering duplicate utamakan buat helper
 - Jika refactor/penambahan fitur membuat sebuah file mulai membesar dan tidak fokus,
   pindahkan bagian yang punya tanggung jawab jelas ke file baru yang namanya spesifik.
   - Contoh pembagian tanggung jawab:

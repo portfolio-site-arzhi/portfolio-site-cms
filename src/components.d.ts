@@ -55,6 +55,7 @@ declare module 'vue' {
     SkillActionsMenu: typeof import('./components/skill/SkillActionsMenu.vue')['default']
     SkillDesktopTableCard: typeof import('./components/skill/SkillDesktopTableCard.vue')['default']
     SkillFormDialog: typeof import('./components/skill/SkillFormDialog.vue')['default']
+    SkillImportDialog: typeof import('./components/skill/SkillImportDialog.vue')['default']
     SkillItemDialog: typeof import('./components/skill/SkillItemDialog.vue')['default']
     SkillItemsEditor: typeof import('./components/skill/SkillItemsEditor.vue')['default']
     SkillMobileListCard: typeof import('./components/skill/SkillMobileListCard.vue')['default']

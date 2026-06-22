@@ -1,12 +1,15 @@
 import type { SkillGroup } from '@/model/skill'
 import {
   deleteSkillApi,
+  exportSkillsApi,
   fetchSkillDetailApi,
   fetchSkillsApi,
   updateSkillApi,
   updateSkillsSortApi,
 } from '@/api/skill-service'
+import { useSkillImport } from '@/logic/skills/use-skill-import'
 import { useAppStore } from '@/stores/app'
+import { extractAttachmentFileName, triggerBrowserDownload } from '@/utils/browser-download'
 
 export function useSkillsPage () {
   const appStore = useAppStore()
@@ -19,6 +22,7 @@ export function useSkillsPage () {
   const sortLoading = ref(false)
   const sortError = ref<string | null>(null)
   const sortDirty = ref(false)
+  const exportLoading = ref(false)
 
   const createDialog = ref(false)
   const editDialog = ref(false)
@@ -28,6 +32,20 @@ export function useSkillsPage () {
   const selectedSkillGroup = ref<SkillGroup | null>(null)
   const loadingSkillGroupId = ref<number | null>(null)
   const lastOrderBackup = ref<SkillGroup[] | null>(null)
+
+  const {
+    importDialog,
+    importLoading,
+    selectedImportFile,
+    importErrorMessage,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImport,
+  } = useSkillImport({
+    isBlocked: () => exportLoading.value,
+    onImported: loadSkillGroups,
+  })
 
   const isSearchActive = computed(() => (search.value ?? '').trim().length > 0)
   const isSortDisabled = computed(() => sortLoading.value || isSearchActive.value)
@@ -237,6 +255,26 @@ export function useSkillsPage () {
     })
   }
 
+  function exportSkillsTemplate (): void {
+    if (exportLoading.value || importLoading.value) {
+      return
+    }
+
+    exportLoading.value = true
+
+    exportSkillsApi().then(response => {
+      const fileName = extractAttachmentFileName(response, 'skills-export.xlsx')
+
+      triggerBrowserDownload(response.data, fileName)
+      appStore.showSuccess('File Excel skills berhasil diunduh.')
+    }).catch(error => {
+      console.error('Failed to export skills excel', error)
+      appStore.showError('Gagal mengunduh file Excel skills.')
+    }).finally(() => {
+      exportLoading.value = false
+    })
+  }
+
   function formatSkillsPreview (skillGroup: SkillGroup): string {
     if (!Array.isArray(skillGroup.skills) || skillGroup.skills.length === 0) {
       return 'Belum ada skill'
@@ -244,6 +282,10 @@ export function useSkillsPage () {
 
     return skillGroup.skills.map(item => item.name).join(', ')
   }
+
+  onMounted(() => {
+    loadSkillGroups()
+  })
 
   return {
     skillGroups,
@@ -254,6 +296,11 @@ export function useSkillsPage () {
     sortLoading,
     sortError,
     sortDirty,
+    exportLoading,
+    importLoading,
+    importDialog,
+    selectedImportFile,
+    importErrorMessage,
     createDialog,
     editDialog,
     deleteDialog,
@@ -267,7 +314,6 @@ export function useSkillsPage () {
     statusDialogTitle,
     statusDialogMessage,
     refreshPage,
-    loadSkillGroups,
     openCreateDialog,
     openEditDialog,
     openDeleteDialog,
@@ -280,6 +326,11 @@ export function useSkillsPage () {
     onDragStart,
     onDragEnd,
     saveSort,
+    exportSkillsTemplate,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImportSkills: confirmImport,
     formatSkillsPreview,
   }
 }
