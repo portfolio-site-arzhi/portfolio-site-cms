@@ -6,21 +6,21 @@
   >
     <v-card>
       <v-card-title class="text-h6">
-        Import Excel Skills
+        Import JSON Portfolio
       </v-card-title>
 
       <v-card-text>
         <div class="text-body-2 text-medium-emphasis mb-4">
-          Pilih file Excel terlebih dahulu, lalu klik tombol import untuk menjalankan proses upload.
+          Pilih file JSON terlebih dahulu, lalu klik tombol import untuk menjalankan proses upload.
         </div>
 
         <div
-          class="skill-import-dropzone"
+          class="portfolio-import-dropzone"
           :class="{
-            'skill-import-dropzone--active': isDragging,
-            'skill-import-dropzone--disabled': loading,
+            'portfolio-import-dropzone--active': isDragging,
+            'portfolio-import-dropzone--disabled': loading,
           }"
-          data-test="skill-import-dropzone"
+          data-test="portfolio-import-dropzone"
           role="button"
           tabindex="0"
           @click="onDropzoneClick"
@@ -34,16 +34,16 @@
           <v-icon
             class="mb-3"
             color="primary"
-            icon="mdi-file-excel"
+            icon="mdi-file-code-outline"
             size="40"
           />
 
           <div class="text-subtitle-1 font-weight-medium mb-1">
-            Tarik dan lepas file Excel di sini
+            Tarik dan lepas file JSON di sini
           </div>
 
           <div class="text-body-2 text-medium-emphasis mb-4">
-            atau klik area ini untuk memilih file berformat .xlsx
+            atau klik area ini untuk memilih file berformat .json
           </div>
 
           <v-btn
@@ -59,10 +59,10 @@
 
         <input
           ref="fileInput"
-          accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          accept=".json,application/json"
           class="d-none"
-          data-test="skills-import-input"
-          name="skills_import_file"
+          data-test="portfolios-import-input"
+          name="portfolios_import_file"
           type="file"
           @change="onFileChange"
         >
@@ -127,14 +127,13 @@
 </template>
 
 <script lang="ts" setup>
-  import type {
-    SkillImportDialogEmits,
-    SkillImportDialogProps,
-  } from '@/model/skill-import'
-  import { useSkillImportDialog } from '@/logic/skills/use-skill-import-dialog'
+  import type { PortfolioImportDialogEmits, PortfolioImportDialogProps } from '@/model/portfolio-import'
+  import {
+    usePortfolioImportDialog,
+  } from '@/logic/portfolios/use-portfolio-import-dialog'
 
-  const props = defineProps<SkillImportDialogProps>()
-  const emit = defineEmits<SkillImportDialogEmits>()
+  const props = defineProps<PortfolioImportDialogProps>()
+  const emit = defineEmits<PortfolioImportDialogEmits>()
 
   const {
     fileInput,
@@ -148,14 +147,14 @@
     onDragLeave,
     onDrop,
     clearFile,
-  } = useSkillImportDialog({
+  } = usePortfolioImportDialog({
     props,
     emit,
   })
 </script>
 
 <style scoped>
-  .skill-import-dropzone {
+  .portfolio-import-dropzone {
     border: 1px dashed rgba(var(--v-border-color), var(--v-border-opacity));
     border-radius: 12px;
     background: rgb(var(--v-theme-surface));
@@ -170,13 +169,13 @@
     justify-content: center;
   }
 
-  .skill-import-dropzone--active {
+  .portfolio-import-dropzone--active {
     border-color: rgb(var(--v-theme-primary));
     background: rgba(var(--v-theme-primary), 0.08);
     transform: translateY(-1px);
   }
 
-  .skill-import-dropzone--disabled {
+  .portfolio-import-dropzone--disabled {
     cursor: not-allowed;
     opacity: 0.72;
   }

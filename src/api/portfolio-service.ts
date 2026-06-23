@@ -9,6 +9,10 @@ import type {
 } from '@/model/portfolio'
 import httpClient from '@/api/http'
 
+const JSON_REQUEST_HEADERS = {
+  Accept: 'application/json',
+}
+
 export function fetchPortfoliosApi (params?: FetchPortfoliosParams): Promise<AxiosResponse<PortfoliosListResponse>> {
   return httpClient.get<PortfoliosListResponse>('/portfolios', {
     params,
@@ -64,4 +68,23 @@ export function deletePortfolioApi (id: number): Promise<AxiosResponse<{ message
 
 export function updatePortfoliosSortApi (payload: UpdatePortfoliosSortPayload): Promise<AxiosResponse<{ message: string }>> {
   return httpClient.patch<{ message: string }>('/portfolios/sort', payload)
+}
+
+export function downloadPortfoliosImportSampleApi (): Promise<AxiosResponse<Blob>> {
+  return httpClient.get<Blob>('/portfolios/import/sample', {
+    headers: JSON_REQUEST_HEADERS,
+    responseType: 'blob',
+  })
+}
+
+export function importPortfoliosApi (file: File): Promise<AxiosResponse<{ message: string }>> {
+  const formData = new FormData()
+
+  formData.append('file', file)
+
+  return httpClient.post<{ message: string }>('/portfolios/import', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 }

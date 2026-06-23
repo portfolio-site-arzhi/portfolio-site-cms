@@ -6,6 +6,7 @@ import {
   updatePortfolioApi,
   updatePortfoliosSortApi,
 } from '@/api/portfolio-service'
+import { usePortfolioImport } from '@/logic/portfolios/use-portfolio-import'
 import { useAppStore } from '@/stores/app'
 
 export function usePortfoliosPage () {
@@ -27,6 +28,21 @@ export function usePortfoliosPage () {
   const selectedPortfolio = ref<Portfolio | null>(null)
   const loadingPortfolioId = ref<number | null>(null)
   const lastOrderBackup = ref<Portfolio[] | null>(null)
+
+  const {
+    sampleLoading,
+    importDialog,
+    importLoading,
+    selectedImportFile,
+    importErrorMessage,
+    downloadImportSample,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImport,
+  } = usePortfolioImport({
+    onImported: loadPortfolios,
+  })
 
   const isSearchActive = computed(() => (search.value ?? '').trim().length > 0)
   const isSortDisabled = computed(() => sortLoading.value || isSearchActive.value)
@@ -276,12 +292,17 @@ export function usePortfoliosPage () {
     loadError,
     search,
     formErrors,
+    sampleLoading,
     sortLoading,
     sortError,
     createDialog,
     editDialog,
     deleteDialog,
     statusDialog,
+    importLoading,
+    importDialog,
+    selectedImportFile,
+    importErrorMessage,
     selectedPortfolio,
     loadingPortfolioId,
     isSearchActive,
@@ -305,6 +326,11 @@ export function usePortfoliosPage () {
     onDragStart,
     onDragEnd,
     saveSort,
+    downloadImportSample,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImportPortfolios: confirmImport,
     formatPublishedAt,
     formatDescription,
   }

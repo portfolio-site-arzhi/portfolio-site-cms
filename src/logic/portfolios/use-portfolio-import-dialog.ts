@@ -1,7 +1,7 @@
-import type { UseExperienceImportDialogOptions } from '@/model/experience-import'
+import type { UsePortfolioImportDialogOptions } from '@/model/portfolio-import'
 import { useSingleFileImportDialog } from '@/logic/shared/use-single-file-import-dialog'
 
-export function useExperienceImportDialog (options: UseExperienceImportDialogOptions) {
+export function usePortfolioImportDialog (options: UsePortfolioImportDialogOptions) {
   return useSingleFileImportDialog({
     getModelValue: () => options.props.modelValue,
     setModelValue: value => options.emit('update:modelValue', value),

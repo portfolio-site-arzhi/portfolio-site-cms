@@ -11,13 +11,15 @@ vi.mock('vuetify', () => ({
   }),
 }))
 
-const { showSuccessMock } = vi.hoisted(() => ({
+const { showSuccessMock, showErrorMock } = vi.hoisted(() => ({
   showSuccessMock: vi.fn(),
+  showErrorMock: vi.fn(),
 }))
 
 vi.mock('@/stores/app', () => ({
   useAppStore: () => ({
     showSuccess: showSuccessMock,
+    showError: showErrorMock,
   }),
 }))
 
@@ -37,9 +39,9 @@ vi.mock('vuedraggable', () => ({
     emits: ['update:modelValue', 'start', 'end'],
     setup (props, { slots }) {
       return () => h(
-        props.tag as any,
+        props.tag as string,
         {},
-        (props.modelValue as any[]).map(element => (slots.item ? slots.item({ element }) : null)),
+        (props.modelValue as Array<unknown>).map(element => (slots.item ? slots.item({ element }) : null)),
       )
     },
   }),
@@ -75,6 +77,8 @@ const {
   updatePortfolioApiMock,
   deletePortfolioApiMock,
   updatePortfoliosSortApiMock,
+  downloadPortfoliosImportSampleApiMock,
+  importPortfoliosApiMock,
 } = vi.hoisted(() => ({
   fetchPortfoliosApiMock: vi.fn(() => Promise.resolve({
     data: {
@@ -100,6 +104,17 @@ const {
       message: 'Sort updated',
     },
   })),
+  downloadPortfoliosImportSampleApiMock: vi.fn(() => Promise.resolve({
+    data: new Blob(['portfolio import sample']),
+    headers: {
+      'content-disposition': 'attachment; filename="portfolios-import-sample.json"',
+    },
+  })),
+  importPortfoliosApiMock: vi.fn(() => Promise.resolve({
+    data: {
+      message: 'Import portfolio berhasil',
+    },
+  })),
 }))
 
 vi.mock('@/api/portfolio-service', () => ({
@@ -108,6 +123,21 @@ vi.mock('@/api/portfolio-service', () => ({
   updatePortfolioApi: updatePortfolioApiMock,
   deletePortfolioApi: deletePortfolioApiMock,
   updatePortfoliosSortApi: updatePortfoliosSortApiMock,
+  downloadPortfoliosImportSampleApi: downloadPortfoliosImportSampleApiMock,
+  importPortfoliosApi: importPortfoliosApiMock,
+}))
+
+const {
+  extractAttachmentFileNameMock,
+  triggerBrowserDownloadMock,
+} = vi.hoisted(() => ({
+  extractAttachmentFileNameMock: vi.fn(() => 'portfolios-import-sample.json'),
+  triggerBrowserDownloadMock: vi.fn(),
+}))
+
+vi.mock('@/utils/browser-download', () => ({
+  extractAttachmentFileName: extractAttachmentFileNameMock,
+  triggerBrowserDownload: triggerBrowserDownloadMock,
 }))
 
 describe('PortfoliosPage', () => {
@@ -115,18 +145,28 @@ describe('PortfoliosPage', () => {
     vi.clearAllMocks()
   })
 
-  it('memuat daftar portfolio saat mount', async () => {
-    const wrapper = mount(PortfoliosPage, {
+  function createWrapper () {
+    return mount(PortfoliosPage, {
       global: {
+        config: {
+          compilerOptions: {
+            isCustomElement: tag => tag.startsWith('v-'),
+          },
+        },
         stubs: {
           teleport: true,
           ConfirmDialog: true,
           PortfolioFormDialog: true,
+          PortfolioImportDialog: true,
           PortfolioDesktopTableCard: true,
           PortfolioMobileListCard: true,
         },
       },
     })
+  }
+
+  it('memuat daftar portfolio saat mount', async () => {
+    const wrapper = createWrapper()
 
     await flushPromises()
 
@@ -139,18 +179,23 @@ describe('PortfoliosPage', () => {
     expect(vm.portfolios).toHaveLength(2)
   })
 
+  it('menampilkan search full-width dan catatan import JSON', async () => {
+    const wrapper = createWrapper()
+
+    await flushPromises()
+
+    const html = wrapper.html()
+
+    expect(html).toContain('name="portfolios_search"')
+    expect(html).toContain('class="d-flex flex-wrap ga-3"')
+    expect(html).toContain('root object')
+    expect(html).toContain('<strong>portfolios</strong>')
+    expect(html).toContain('<strong>image</strong>')
+    expect(html).toContain('<strong>published_at</strong>')
+  })
+
   it('memuat ulang daftar saat kata kunci pencarian berubah', async () => {
-    const wrapper = mount(PortfoliosPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ConfirmDialog: true,
-          PortfolioFormDialog: true,
-          PortfolioDesktopTableCard: true,
-          PortfolioMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -170,17 +215,7 @@ describe('PortfoliosPage', () => {
   })
 
   it('mengirim update sort saat tombol simpan ditekan', async () => {
-    const wrapper = mount(PortfoliosPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ConfirmDialog: true,
-          PortfolioFormDialog: true,
-          PortfolioDesktopTableCard: true,
-          PortfolioMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -207,21 +242,11 @@ describe('PortfoliosPage', () => {
   })
 
   it('mengubah status publish saat konfirmasi', async () => {
-    const wrapper = mount(PortfoliosPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ConfirmDialog: true,
-          PortfolioFormDialog: true,
-          PortfolioDesktopTableCard: true,
-          PortfolioMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
-      openStatusDialog: (portfolio: any) => void
+      openStatusDialog: (portfolio: unknown) => void
       confirmStatusChange: () => void
     }
 
@@ -237,21 +262,11 @@ describe('PortfoliosPage', () => {
   })
 
   it('menghapus portfolio saat konfirmasi', async () => {
-    const wrapper = mount(PortfoliosPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ConfirmDialog: true,
-          PortfolioFormDialog: true,
-          PortfolioDesktopTableCard: true,
-          PortfolioMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
-      selectedPortfolio: any
+      selectedPortfolio: unknown
       confirmDelete: () => void
     }
 
@@ -261,5 +276,77 @@ describe('PortfoliosPage', () => {
     await flushPromises()
 
     expect(deletePortfolioApiMock).toHaveBeenCalledWith(1)
+  })
+
+  it('mengunduh sample file import portfolio', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      downloadImportSample: () => void
+    }
+
+    vm.downloadImportSample()
+
+    await flushPromises()
+
+    expect(downloadPortfoliosImportSampleApiMock).toHaveBeenCalledTimes(1)
+    expect(extractAttachmentFileNameMock).toHaveBeenCalledTimes(1)
+    expect(triggerBrowserDownloadMock).toHaveBeenCalledTimes(1)
+    expect(showSuccessMock).toHaveBeenCalledWith('File sample import portfolio berhasil diunduh.')
+  })
+
+  it('membuka dialog import lalu mengirim file JSON setelah dikonfirmasi', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      importDialog: boolean
+      openImportDialog: () => void
+      selectImportFile: (file: File | null) => void
+      confirmImportPortfolios: () => void
+    }
+    const file = new File(['{"portfolios": []}'], 'portfolios-import.json', {
+      type: 'application/json',
+    })
+
+    vm.openImportDialog()
+    vm.selectImportFile(file)
+
+    expect(vm.importDialog).toBe(true)
+    expect(importPortfoliosApiMock).not.toHaveBeenCalled()
+
+    vm.confirmImportPortfolios()
+
+    await flushPromises()
+
+    expect(importPortfoliosApiMock).toHaveBeenCalledWith(file)
+    expect(fetchPortfoliosApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Import portfolio berhasil')
+  })
+
+  it('menahan import jika file bukan json', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      importErrorMessage: string | null
+      openImportDialog: () => void
+      selectImportFile: (file: File | null) => void
+      confirmImportPortfolios: () => void
+    }
+    const invalidFile = new File(['plain-text'], 'portfolios-import.txt', {
+      type: 'text/plain',
+    })
+
+    vm.openImportDialog()
+    vm.selectImportFile(invalidFile)
+    vm.confirmImportPortfolios()
+
+    await flushPromises()
+
+    expect(vm.importErrorMessage).toBe('File yang diunggah harus berformat .json.')
+    expect(importPortfoliosApiMock).not.toHaveBeenCalled()
+    expect(showErrorMock).not.toHaveBeenCalled()
   })
 })

@@ -17,22 +17,53 @@
           </div>
         </div>
 
-        <div class="d-flex flex-column flex-sm-row">
+        <div class="mb-3">
           <v-text-field
             v-model="search"
-            class="mb-3 mb-sm-0 mr-sm-4"
             clearable
             density="compact"
             hide-details
+            name="portfolios_search"
             placeholder="Cari portfolio"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             @change="refreshPage"
             @click:clear="clearSearch"
           />
+        </div>
+
+        <div class="d-flex flex-wrap ga-3">
+          <v-btn
+            color="primary"
+            data-test="download-portfolio-import-sample"
+            :disabled="importLoading"
+            :loading="sampleLoading"
+            variant="outlined"
+            @click="downloadImportSample"
+          >
+            <v-icon
+              icon="mdi-download"
+              start
+            />
+            Sample JSON
+          </v-btn>
 
           <v-btn
-            class="align-self-sm-start mb-3 mb-sm-0 mr-sm-3"
+            color="primary"
+            data-test="import-portfolios"
+            :disabled="sampleLoading"
+            :loading="importLoading"
+            variant="outlined"
+            @click="openImportDialog"
+          >
+            <v-icon
+              icon="mdi-upload"
+              start
+            />
+            Import JSON
+          </v-btn>
+
+          <v-btn
             color="primary"
             data-test="save-portfolio-sort"
             :disabled="isSortDisabled"
@@ -48,7 +79,6 @@
           </v-btn>
 
           <v-btn
-            class="align-self-sm-start"
             color="primary"
             data-test="add-portfolio"
             variant="flat"
@@ -61,6 +91,19 @@
             Tambah
           </v-btn>
         </div>
+
+        <v-alert
+          class="mt-3 mb-0"
+          data-test="portfolios-import-note"
+          density="comfortable"
+          type="info"
+          variant="tonal"
+        >
+          Catatan import: file harus <strong>.json</strong> dengan root object
+          <strong>portfolios</strong>. Field <strong>image</strong> tidak ikut diimport,
+          dan <strong>published_at</strong> memakai format <strong>ISO 8601</strong> atau
+          <strong>null</strong>.
+        </v-alert>
       </v-col>
     </v-row>
 
@@ -163,6 +206,16 @@
       @updated="onPortfolioUpdated"
     />
 
+    <PortfolioImportDialog
+      v-model="importDialog"
+      :error-message="importErrorMessage"
+      :loading="importLoading"
+      :selected-file="selectedImportFile"
+      @clear-file="clearSelectedImportFile"
+      @confirm="confirmImportPortfolios"
+      @select-file="selectImportFile"
+    />
+
     <ConfirmDialog
       v-model="deleteDialog"
       cancel-text="Batal"
@@ -190,6 +243,7 @@
   import ConfirmDialog from '@/components/ConfirmDialog.vue'
   import PortfolioDesktopTableCard from '@/components/portfolio/PortfolioDesktopTableCard.vue'
   import PortfolioFormDialog from '@/components/portfolio/PortfolioFormDialog.vue'
+  import PortfolioImportDialog from '@/components/portfolio/PortfolioImportDialog.vue'
   import PortfolioMobileListCard from '@/components/portfolio/PortfolioMobileListCard.vue'
   import { usePortfoliosPage } from '@/logic/portfolios/use-portfolios-page'
 
@@ -201,12 +255,17 @@
     loadError,
     search,
     formErrors,
+    sampleLoading,
     sortLoading,
     sortError,
     createDialog,
     editDialog,
     deleteDialog,
     statusDialog,
+    importLoading,
+    importDialog,
+    selectedImportFile,
+    importErrorMessage,
     selectedPortfolio,
     loadingPortfolioId,
     isSearchActive,
@@ -229,6 +288,11 @@
     onDragStart,
     onDragEnd,
     saveSort,
+    downloadImportSample,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImportPortfolios,
     formatPublishedAt,
     formatDescription,
   } = usePortfoliosPage()

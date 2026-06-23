@@ -39,6 +39,7 @@ declare module 'vue' {
     PortfolioDesktopTableCard: typeof import('./components/portfolio/PortfolioDesktopTableCard.vue')['default']
     PortfolioFormDialog: typeof import('./components/portfolio/PortfolioFormDialog.vue')['default']
     PortfolioImageInput: typeof import('./components/portfolio/PortfolioImageInput.vue')['default']
+    PortfolioImportDialog: typeof import('./components/portfolio/PortfolioImportDialog.vue')['default']
     PortfolioMobileListCard: typeof import('./components/portfolio/PortfolioMobileListCard.vue')['default']
     PortfolioStackDialog: typeof import('./components/portfolio/PortfolioStackDialog.vue')['default']
     PortfolioStacksEditor: typeof import('./components/portfolio/PortfolioStacksEditor.vue')['default']
