@@ -6,6 +6,7 @@ import {
   updateExperienceApi,
   updateExperiencesSortApi,
 } from '@/api/experience-service'
+import { useExperienceImport } from '@/logic/experiences/use-experience-import'
 import { useAppStore } from '@/stores/app'
 
 export function useExperiencesPage () {
@@ -28,6 +29,21 @@ export function useExperiencesPage () {
   const selectedExperience = ref<Experience | null>(null)
   const loadingExperienceId = ref<number | null>(null)
   const lastOrderBackup = ref<Experience[] | null>(null)
+
+  const {
+    sampleLoading,
+    importDialog,
+    importLoading,
+    selectedImportFile,
+    importErrorMessage,
+    downloadImportSample,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImport,
+  } = useExperienceImport({
+    onImported: loadExperiences,
+  })
 
   const isSearchActive = computed(() => (search.value ?? '').trim().length > 0)
   const isSortDisabled = computed(() => sortLoading.value || isSearchActive.value)
@@ -284,6 +300,11 @@ export function useExperiencesPage () {
     loadError,
     search,
     formErrors,
+    sampleLoading,
+    importLoading,
+    importDialog,
+    selectedImportFile,
+    importErrorMessage,
     sortLoading,
     sortError,
     sortDirty,
@@ -314,6 +335,11 @@ export function useExperiencesPage () {
     onDragStart,
     onDragEnd,
     saveSort,
+    downloadImportSample,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImportExperiences: confirmImport,
     formatYears,
   }
 }

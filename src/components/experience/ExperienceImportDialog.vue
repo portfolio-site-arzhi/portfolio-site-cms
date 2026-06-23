@@ -1,0 +1,182 @@
+<template>
+  <v-dialog
+    v-model="internalModel"
+    max-width="560"
+    :persistent="loading"
+  >
+    <v-card>
+      <v-card-title class="text-h6">
+        Import JSON Experience
+      </v-card-title>
+
+      <v-card-text>
+        <div class="text-body-2 text-medium-emphasis mb-4">
+          Pilih file JSON terlebih dahulu, lalu klik tombol import untuk menjalankan proses upload.
+        </div>
+
+        <div
+          class="experience-import-dropzone"
+          :class="{
+            'experience-import-dropzone--active': isDragging,
+            'experience-import-dropzone--disabled': loading,
+          }"
+          data-test="experience-import-dropzone"
+          role="button"
+          tabindex="0"
+          @click="onDropzoneClick"
+          @dragenter.prevent="onDragEnter"
+          @dragleave.prevent="onDragLeave"
+          @dragover.prevent="onDragOver"
+          @drop.prevent="onDrop"
+          @keydown.enter.prevent="onDropzoneClick"
+          @keydown.space.prevent="onDropzoneClick"
+        >
+          <v-icon
+            class="mb-3"
+            color="primary"
+            icon="mdi-file-code-outline"
+            size="40"
+          />
+
+          <div class="text-subtitle-1 font-weight-medium mb-1">
+            Tarik dan lepas file JSON di sini
+          </div>
+
+          <div class="text-body-2 text-medium-emphasis mb-4">
+            atau klik area ini untuk memilih file berformat .json
+          </div>
+
+          <v-btn
+            color="primary"
+            :disabled="loading"
+            prepend-icon="mdi-upload"
+            variant="outlined"
+            @click.stop="openPicker"
+          >
+            Pilih File
+          </v-btn>
+        </div>
+
+        <input
+          ref="fileInput"
+          accept=".json,application/json"
+          class="d-none"
+          data-test="experiences-import-input"
+          name="experiences_import_file"
+          type="file"
+          @change="onFileChange"
+        >
+
+        <v-alert
+          v-if="selectedFile"
+          class="mt-4"
+          density="comfortable"
+          type="success"
+          variant="tonal"
+        >
+          <div class="d-flex flex-wrap align-center justify-space-between ga-2">
+            <span class="text-body-2">
+              File terpilih: <strong>{{ selectedFile.name }}</strong>
+            </span>
+
+            <v-btn
+              color="secondary"
+              :disabled="loading"
+              size="small"
+              variant="text"
+              @click.stop="clearFile"
+            >
+              Hapus File
+            </v-btn>
+          </div>
+        </v-alert>
+
+        <v-alert
+          v-if="errorMessage"
+          class="mt-4"
+          density="comfortable"
+          type="error"
+          variant="tonal"
+        >
+          {{ errorMessage }}
+        </v-alert>
+      </v-card-text>
+
+      <v-card-actions class="justify-end">
+        <v-btn
+          color="secondary"
+          :disabled="loading"
+          variant="text"
+          @click="internalModel = false"
+        >
+          Batal
+        </v-btn>
+
+        <v-btn
+          color="primary"
+          :disabled="!selectedFile || loading"
+          :loading="loading"
+          variant="flat"
+          @click="emit('confirm')"
+        >
+          Import
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
+<script lang="ts" setup>
+  import type { ExperienceImportDialogEmits, ExperienceImportDialogProps } from '@/model/experience-import'
+  import {
+    useExperienceImportDialog,
+  } from '@/logic/experiences/use-experience-import-dialog'
+
+  const props = defineProps<ExperienceImportDialogProps>()
+  const emit = defineEmits<ExperienceImportDialogEmits>()
+
+  const {
+    fileInput,
+    isDragging,
+    internalModel,
+    openPicker,
+    onDropzoneClick,
+    onFileChange,
+    onDragEnter,
+    onDragOver,
+    onDragLeave,
+    onDrop,
+    clearFile,
+  } = useExperienceImportDialog({
+    props,
+    emit,
+  })
+</script>
+
+<style scoped>
+  .experience-import-dropzone {
+    border: 1px dashed rgba(var(--v-border-color), var(--v-border-opacity));
+    border-radius: 12px;
+    background: rgb(var(--v-theme-surface));
+    cursor: pointer;
+    min-height: 220px;
+    padding: 24px;
+    text-align: center;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .experience-import-dropzone--active {
+    border-color: rgb(var(--v-theme-primary));
+    background: rgba(var(--v-theme-primary), 0.08);
+    transform: translateY(-1px);
+  }
+
+  .experience-import-dropzone--disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
+  }
+</style>

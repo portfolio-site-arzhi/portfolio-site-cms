@@ -17,22 +17,53 @@
           </div>
         </div>
 
-        <div class="d-flex flex-column flex-sm-row">
+        <div class="mb-3">
           <v-text-field
             v-model="search"
-            class="mb-3 mb-sm-0 mr-sm-4"
             clearable
             density="compact"
             hide-details
+            name="experiences_search"
             placeholder="Cari experience"
             prepend-inner-icon="mdi-magnify"
             variant="outlined"
             @change="refreshPage"
             @click:clear="clearSearch"
           />
+        </div>
+
+        <div class="d-flex flex-wrap ga-3">
+          <v-btn
+            color="primary"
+            data-test="download-experience-import-sample"
+            :disabled="importLoading"
+            :loading="sampleLoading"
+            variant="outlined"
+            @click="downloadImportSample"
+          >
+            <v-icon
+              icon="mdi-download"
+              start
+            />
+            Sample JSON
+          </v-btn>
 
           <v-btn
-            class="align-self-sm-start mb-3 mb-sm-0 mr-sm-3"
+            color="primary"
+            data-test="import-experiences"
+            :disabled="sampleLoading"
+            :loading="importLoading"
+            variant="outlined"
+            @click="openImportDialog"
+          >
+            <v-icon
+              icon="mdi-upload"
+              start
+            />
+            Import JSON
+          </v-btn>
+
+          <v-btn
             color="primary"
             data-test="save-sort"
             :disabled="isSortDisabled"
@@ -48,7 +79,6 @@
           </v-btn>
 
           <v-btn
-            class="align-self-sm-start"
             color="primary"
             data-test="add-experience"
             variant="flat"
@@ -61,6 +91,18 @@
             Tambah
           </v-btn>
         </div>
+
+        <v-alert
+          class="mt-3 mb-0"
+          data-test="experiences-import-note"
+          density="comfortable"
+          type="info"
+          variant="tonal"
+        >
+          Catatan import: file harus <strong>.json</strong> dengan root object
+          <strong>experiences</strong>. Field tanggal memakai format <strong>YYYY-MM-01</strong>,
+          dan jika <strong>is_current</strong> bernilai true maka <strong>end_date</strong> harus null.
+        </v-alert>
       </v-col>
     </v-row>
 
@@ -160,6 +202,16 @@
       @updated="onExperienceUpdated"
     />
 
+    <ExperienceImportDialog
+      v-model="importDialog"
+      :error-message="importErrorMessage"
+      :loading="importLoading"
+      :selected-file="selectedImportFile"
+      @clear-file="clearSelectedImportFile"
+      @confirm="confirmImportExperiences"
+      @select-file="selectImportFile"
+    />
+
     <ConfirmDialog
       v-model="deleteDialog"
       cancel-text="Batal"
@@ -187,6 +239,7 @@
   import ConfirmDialog from '@/components/ConfirmDialog.vue'
   import ExperienceDesktopTableCard from '@/components/experience/ExperienceDesktopTableCard.vue'
   import ExperienceFormDialog from '@/components/experience/ExperienceFormDialog.vue'
+  import ExperienceImportDialog from '@/components/experience/ExperienceImportDialog.vue'
   import ExperienceMobileListCard from '@/components/experience/ExperienceMobileListCard.vue'
   import { useExperiencesPage } from '@/logic/experiences/use-experiences-page'
 
@@ -198,6 +251,11 @@
     loadError,
     search,
     formErrors,
+    sampleLoading,
+    importLoading,
+    importDialog,
+    selectedImportFile,
+    importErrorMessage,
     sortLoading,
     sortError,
     createDialog,
@@ -226,6 +284,11 @@
     onDragStart,
     onDragEnd,
     saveSort,
+    downloadImportSample,
+    openImportDialog,
+    selectImportFile,
+    clearSelectedImportFile,
+    confirmImportExperiences,
     formatYears,
   } = useExperiencesPage()
 </script>

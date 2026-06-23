@@ -11,13 +11,15 @@ vi.mock('vuetify', () => ({
   }),
 }))
 
-const { showSuccessMock } = vi.hoisted(() => ({
+const { showSuccessMock, showErrorMock } = vi.hoisted(() => ({
   showSuccessMock: vi.fn(),
+  showErrorMock: vi.fn(),
 }))
 
 vi.mock('@/stores/app', () => ({
   useAppStore: () => ({
     showSuccess: showSuccessMock,
+    showError: showErrorMock,
   }),
 }))
 
@@ -69,6 +71,8 @@ const {
   updateExperienceApiMock,
   deleteExperienceApiMock,
   updateExperiencesSortApiMock,
+  downloadExperiencesImportSampleApiMock,
+  importExperiencesApiMock,
 } = vi.hoisted(() => ({
   fetchExperiencesApiMock: vi.fn(() => Promise.resolve({
     data: {
@@ -94,6 +98,17 @@ const {
       message: 'Sort updated',
     },
   })),
+  downloadExperiencesImportSampleApiMock: vi.fn(() => Promise.resolve({
+    data: new Blob(['experience import sample']),
+    headers: {
+      'content-disposition': 'attachment; filename="experiences-import-sample.json"',
+    },
+  })),
+  importExperiencesApiMock: vi.fn(() => Promise.resolve({
+    data: {
+      message: 'Import experience berhasil',
+    },
+  })),
 }))
 
 vi.mock('@/api/experience-service', () => ({
@@ -102,6 +117,21 @@ vi.mock('@/api/experience-service', () => ({
   updateExperienceApi: updateExperienceApiMock,
   deleteExperienceApi: deleteExperienceApiMock,
   updateExperiencesSortApi: updateExperiencesSortApiMock,
+  downloadExperiencesImportSampleApi: downloadExperiencesImportSampleApiMock,
+  importExperiencesApi: importExperiencesApiMock,
+}))
+
+const {
+  extractAttachmentFileNameMock,
+  triggerBrowserDownloadMock,
+} = vi.hoisted(() => ({
+  extractAttachmentFileNameMock: vi.fn(() => 'experiences-import-sample.json'),
+  triggerBrowserDownloadMock: vi.fn(),
+}))
+
+vi.mock('@/utils/browser-download', () => ({
+  extractAttachmentFileName: extractAttachmentFileNameMock,
+  triggerBrowserDownload: triggerBrowserDownloadMock,
 }))
 
 describe('ExperiencesPage', () => {
@@ -109,16 +139,28 @@ describe('ExperiencesPage', () => {
     vi.clearAllMocks()
   })
 
-  it('memuat daftar experience saat mount', async () => {
-    const wrapper = mount(ExperiencesPage, {
+  function createWrapper () {
+    return mount(ExperiencesPage, {
       global: {
+        config: {
+          compilerOptions: {
+            isCustomElement: tag => tag.startsWith('v-'),
+          },
+        },
         stubs: {
           teleport: true,
+          ConfirmDialog: true,
+          ExperienceFormDialog: true,
+          ExperienceImportDialog: true,
           ExperienceDesktopTableCard: true,
           ExperienceMobileListCard: true,
         },
       },
     })
+  }
+
+  it('memuat daftar experience saat mount', async () => {
+    const wrapper = createWrapper()
 
     await flushPromises()
 
@@ -131,19 +173,24 @@ describe('ExperiencesPage', () => {
     expect(vm.experiences).toHaveLength(2)
   })
 
-  it('memuat ulang daftar saat kata kunci pencarian berubah', async () => {
-    const wrapper = mount(ExperiencesPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ExperienceDesktopTableCard: true,
-          ExperienceMobileListCard: true,
-        },
-      },
-    })
+  it('menampilkan search full-width dan catatan import JSON', async () => {
+    const wrapper = createWrapper()
+
     await flushPromises()
 
-    expect(fetchExperiencesApiMock).toHaveBeenCalledTimes(1)
+    const html = wrapper.html()
+
+    expect(html).toContain('name="experiences_search"')
+    expect(html).toContain('class="d-flex flex-wrap ga-3"')
+    expect(html).toContain('root object')
+    expect(html).toContain('<strong>experiences</strong>')
+    expect(html).toContain('YYYY-MM-01')
+    expect(html).toContain('<strong>end_date</strong>')
+  })
+
+  it('memuat ulang daftar saat kata kunci pencarian berubah', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
 
     const vm = wrapper.vm as unknown as {
       search: string | null
@@ -162,15 +209,7 @@ describe('ExperiencesPage', () => {
   })
 
   it('mengosongkan input saat clear search dan memuat ulang data', async () => {
-    const wrapper = mount(ExperiencesPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ExperienceDesktopTableCard: true,
-          ExperienceMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -195,19 +234,11 @@ describe('ExperiencesPage', () => {
   })
 
   it('menampilkan snackbar sukses saat experience dibuat', async () => {
-    const wrapper = mount(ExperiencesPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ExperienceDesktopTableCard: true,
-          ExperienceMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
-      onExperienceCreated: (exp: any) => void
+      onExperienceCreated: (exp: unknown) => void
     }
 
     vm.onExperienceCreated({ ...baseExperience, id: 99 })
@@ -216,15 +247,7 @@ describe('ExperiencesPage', () => {
   })
 
   it('mengirim update sort saat tombol simpan ditekan', async () => {
-    const wrapper = mount(ExperiencesPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ExperienceDesktopTableCard: true,
-          ExperienceMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
@@ -251,19 +274,11 @@ describe('ExperiencesPage', () => {
   })
 
   it('mengubah status publish saat konfirmasi', async () => {
-    const wrapper = mount(ExperiencesPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ExperienceDesktopTableCard: true,
-          ExperienceMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
-      openStatusDialog: (exp: any) => void
+      openStatusDialog: (exp: unknown) => void
       confirmStatusChange: () => void
     }
 
@@ -278,19 +293,11 @@ describe('ExperiencesPage', () => {
   })
 
   it('menghapus experience saat konfirmasi', async () => {
-    const wrapper = mount(ExperiencesPage, {
-      global: {
-        stubs: {
-          teleport: true,
-          ExperienceDesktopTableCard: true,
-          ExperienceMobileListCard: true,
-        },
-      },
-    })
+    const wrapper = createWrapper()
     await flushPromises()
 
     const vm = wrapper.vm as unknown as {
-      selectedExperience: any
+      selectedExperience: unknown
       confirmDelete: () => void
     }
 
@@ -300,5 +307,77 @@ describe('ExperiencesPage', () => {
     await flushPromises()
 
     expect(deleteExperienceApiMock).toHaveBeenCalledWith(1)
+  })
+
+  it('mengunduh sample file import experience', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      downloadImportSample: () => void
+    }
+
+    vm.downloadImportSample()
+
+    await flushPromises()
+
+    expect(downloadExperiencesImportSampleApiMock).toHaveBeenCalledTimes(1)
+    expect(extractAttachmentFileNameMock).toHaveBeenCalledTimes(1)
+    expect(triggerBrowserDownloadMock).toHaveBeenCalledTimes(1)
+    expect(showSuccessMock).toHaveBeenCalledWith('File sample import experience berhasil diunduh.')
+  })
+
+  it('membuka dialog import lalu mengirim file JSON setelah dikonfirmasi', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      importDialog: boolean
+      openImportDialog: () => void
+      selectImportFile: (file: File | null) => void
+      confirmImportExperiences: () => void
+    }
+    const file = new File(['{"experiences": []}'], 'experiences-import.json', {
+      type: 'application/json',
+    })
+
+    vm.openImportDialog()
+    vm.selectImportFile(file)
+
+    expect(vm.importDialog).toBe(true)
+    expect(importExperiencesApiMock).not.toHaveBeenCalled()
+
+    vm.confirmImportExperiences()
+
+    await flushPromises()
+
+    expect(importExperiencesApiMock).toHaveBeenCalledWith(file)
+    expect(fetchExperiencesApiMock).toHaveBeenCalledTimes(2)
+    expect(showSuccessMock).toHaveBeenCalledWith('Import experience berhasil')
+  })
+
+  it('menahan import jika file bukan json', async () => {
+    const wrapper = createWrapper()
+    await flushPromises()
+
+    const vm = wrapper.vm as unknown as {
+      importErrorMessage: string | null
+      openImportDialog: () => void
+      selectImportFile: (file: File | null) => void
+      confirmImportExperiences: () => void
+    }
+    const invalidFile = new File(['plain-text'], 'experiences-import.txt', {
+      type: 'text/plain',
+    })
+
+    vm.openImportDialog()
+    vm.selectImportFile(invalidFile)
+    vm.confirmImportExperiences()
+
+    await flushPromises()
+
+    expect(vm.importErrorMessage).toBe('File yang diunggah harus berformat .json.')
+    expect(importExperiencesApiMock).not.toHaveBeenCalled()
+    expect(showErrorMock).not.toHaveBeenCalled()
   })
 })

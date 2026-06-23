@@ -27,6 +27,7 @@ declare module 'vue' {
     ExperienceDescriptionLocaleEditor: typeof import('./components/experience/ExperienceDescriptionLocaleEditor.vue')['default']
     ExperienceDesktopTableCard: typeof import('./components/experience/ExperienceDesktopTableCard.vue')['default']
     ExperienceFormDialog: typeof import('./components/experience/ExperienceFormDialog.vue')['default']
+    ExperienceImportDialog: typeof import('./components/experience/ExperienceImportDialog.vue')['default']
     ExperienceMobileListCard: typeof import('./components/experience/ExperienceMobileListCard.vue')['default']
     ExperienceSkillDialog: typeof import('./components/experience/ExperienceSkillDialog.vue')['default']
     ExperienceSkillsEditor: typeof import('./components/experience/ExperienceSkillsEditor.vue')['default']
